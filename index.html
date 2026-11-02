@@ -1,587 +1,489 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>words - شبكة المراسلة الآمنة</title>
-    <!-- Web App Manifest للتثبيت على الهاتف -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIndvcmRzIiwKICAic2hvcnRfbmFtZSI6ICJ3b3JkcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZTBmMmZlIiwKICAidGhlbWVfY29sb3IiOiAiIzAyODRjNyIKfQ==">
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary-blue: #0284c7;
-            --light-blue-grad: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
-            --text-dark: #0f172a;
-            --text-muted: #475569;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0; padding: 0;
-            font-family: 'Tajawal', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background: var(--light-blue-grad);
-            background-attachment: fixed;
-            color: var(--text-dark);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 430px;
-            height: 100vh;
-            background: rgba(248, 250, 252, 0.6);
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-            padding: 24px 20px;
-            overflow-y: auto;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .screen.active { display: flex; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .brand-header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .brand-logo {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            color: #0369a1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        .brand-logo::after { content: '❖'; font-size: 1.4rem; color: #0284c7; }
-
-        /* زر التثبيت الذكي الذي يختفي تلقائياً عند التثبيت */
-        .btn-install {
-            background: #e0f2fe;
-            color: #0284c7;
-            border: 1px solid #bae6fd;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .hero-img {
-            width: 140px; height: 140px;
-            margin: 15px auto;
-            background: #e0f2fe;
-            border-radius: 30px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3.5rem;
-            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
-        }
-
-        .title-primary { font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
-        .subtitle { font-size: 1rem; text-align: center; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
-
-        .btn-primary {
-            background: #0284c7;
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 16px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            width: 100%;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
-            margin-top: auto;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #0284c7;
-            border: none;
-            padding: 12px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            text-align: center;
-            cursor: pointer;
-            margin-top: 6px;
-        }
-
-        .custom-input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 14px;
-            border: 1.5px solid #bae6fd;
-            background: white;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .action-card {
-            background: white;
-            border-radius: 16px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            cursor: pointer;
-        }
-
-        .action-icon {
-            width: 44px; height: 44px;
-            border-radius: 12px;
-            background: #e0f2fe;
-            color: #0284c7;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.3rem; font-weight: bold;
-        }
-
-        .action-text { display: flex; flex-direction: column; }
-        .action-title { font-weight: 700; font-size: 0.98rem; }
-        .action-desc { font-size: 0.8rem; color: var(--text-muted); }
-
-        .modal {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            display: none;
-            align-items: center; justify-content: center;
-            padding: 20px; z-index: 100;
-        }
-
-        .modal-card {
-            background: white;
-            border-radius: 24px;
-            padding: 24px;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .chat-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;
-        }
-
-        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; }
-        .msg-bubble.sent { align-self: flex-start; background: #0284c7; color: white; border-bottom-right-radius: 4px; }
-        .msg-bubble.received { align-self: flex-end; background: white; color: var(--text-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-
-        .quick-nav {
-            display: flex; gap: 6px; margin-top: 10px;
-            background: rgba(255,255,255,0.7); padding: 6px; border-radius: 16px;
-        }
-        .quick-btn {
-            flex: 1; padding: 10px; border: none; background: transparent;
-            color: var(--text-muted); font-weight: bold; font-size: 0.82rem; border-radius: 12px; cursor: pointer;
-        }
-        .quick-btn.active { background: white; color: #0284c7; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#8fb8e8">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>words</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg1:#e6f0fc;--bg2:#b9d4f3;--bg3:#8fb8e8;--ink:#1e3a5f;--mut:#5a7396;--brand:#4b86c8;--brand2:#2f6db5;--card:rgba(255,255,255,.8);--line:#c5daf3;--bad:#c0392b;--ok:#1f8a5b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg1:#16273d;--bg2:#1b3556;--bg3:#244a78;--ink:#e6f0fc;--mut:#9db8d9;--brand:#6aa3e6;--brand2:#8dbbf0;--card:rgba(22,39,61,.88);--line:#2f5382}}
+:root[data-theme="dark"]{--bg1:#16273d;--bg2:#1b3556;--bg3:#244a78;--ink:#e6f0fc;--mut:#9db8d9;--brand:#6aa3e6;--brand2:#8dbbf0;--card:rgba(22,39,61,.88);--line:#2f5382}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal',system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:linear-gradient(160deg,var(--bg1),var(--bg2) 55%,var(--bg3));background-attachment:fixed;color:var(--ink);display:flex;justify-content:center}
+#app{width:100%;max-width:460px;height:100%;display:flex;flex-direction:column;position:relative}
+header{display:flex;align-items:center;gap:10px;padding:14px 18px 8px}
+header img{width:40px;height:40px;border-radius:11px;object-fit:cover;box-shadow:0 2px 8px rgba(47,109,181,.3)}
+#brand{font-size:1.7rem;font-weight:800;color:var(--brand2);user-select:none;cursor:pointer}
+#view{flex:1;overflow-y:auto;padding:8px 16px 12px;display:flex;flex-direction:column;gap:10px}
+nav{display:flex;gap:6px;margin:6px 14px 12px;padding:6px;background:var(--card);border-radius:18px;border:1px solid var(--line)}
+nav button{flex:1;padding:10px 4px;border:0;background:none;color:var(--mut);font-weight:700;font-size:.85rem;border-radius:12px;cursor:pointer}
+nav button.on{background:var(--brand);color:#fff}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.row{display:flex;align-items:center;gap:10px;cursor:pointer}
+.av{width:42px;height:42px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none;font-size:1.1rem}
+.av img{width:100%;height:100%;border-radius:50%;object-fit:cover}.av.lg{width:64px;height:64px;font-size:1.6rem}
+.grow{flex:1;min-width:0}.t{font-weight:700}.s{font-size:.8rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.s.w{white-space:normal;line-height:1.6}
+input,textarea{width:100%;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font-size:1rem;outline:none}
+textarea{min-height:80px;resize:vertical}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:14px;padding:12px 16px;font-weight:700;font-size:1rem;cursor:pointer}
+.btn.sec{background:transparent;color:var(--brand2);border:1.5px solid var(--line)}
+.btn.bad{background:var(--bad)}
+.btn.sm{padding:6px 10px;font-size:.85rem}
+.flex{display:flex;gap:8px;align-items:center}
+h2{font-size:1.15rem;color:var(--brand2)}
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0}
+.b{max-width:82%;padding:10px 14px;border-radius:18px;word-break:break-word;white-space:pre-wrap}
+.b.me{align-self:flex-start;background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.b.th{align-self:flex-end;background:var(--card);border:1px solid var(--line);border-bottom-left-radius:4px}
+.b small{display:block;font-size:.65rem;opacity:.75;margin-top:2px}
+.mono{font-family:ui-monospace,monospace;font-size:.75rem;word-break:break-all;direction:ltr;text-align:left}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--mut);flex:none}.dot.ok{background:var(--ok)}.dot.bad{background:var(--bad)}
+#toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg1);padding:10px 18px;border-radius:20px;font-size:.9rem;opacity:0;transition:.3s;pointer-events:none;z-index:50}
+#toast.on{opacity:1}
+#call{position:fixed;inset:0;background:#0d1b2e;z-index:99;display:none;flex-direction:column}
+#call video#rv{flex:1;width:100%;object-fit:cover;min-height:0;background:#0d1b2e}
+#call video#lv{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:12px;width:100px;border-radius:12px;border:2px solid #fff;background:#000}
+#call .ctl{display:flex;justify-content:center;gap:14px;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px))}
+</style>
 </head>
 <body>
-
-<div class="app-container">
-
-    <!-- 1. شاشة الترحيب -->
-    <div class="screen active" id="screen-welcome">
-        <div class="brand-header-bar">
-            <div class="brand-logo">words</div>
-            <button class="btn-install" id="installBtn" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
-        </div>
-        <div class="hero-img">📱</div>
-        <h1 class="title-primary">كُن حُرَّاً في شبكتك</h1>
-        <p class="subtitle">مُراسلة خاصة وآمنة بالكامل.<br>أول شبكة تمتلك فيها جهات اتصالك ومجموعاتك بنفسك.</p>
-        <button class="btn-primary" onclick="nextScreen('screen-rules')">ابدأ الآن</button>
-        <button class="btn-secondary" onclick="showCustomAlert('لماذا بنينا words؟', 'منصة words مبنية على البنية المشفرة المستقلة بدون وجود خوادم مركزية تخزن بياناتك.')">لماذا بنينا words؟</button>
-    </div>
-
-    <!-- 2. شاشة الشروط -->
-    <div class="screen" id="screen-rules">
-        <div class="brand-header-bar">
-            <div class="brand-logo">words</div>
-            <button class="btn-install installBtnDynamic" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
-        </div>
-        <h2 class="title-primary" style="margin-top: 15px;">التزامات الشبكة</h2>
-        <p class="subtitle" style="text-align: right; margin-bottom: 12px;">يلتزم التطبيق بما يلي:</p>
-        <div style="background: white; padding: 15px; border-radius: 14px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);">
-            • الاستقلالية التامة وعدم تتبع بياناتك.<br>
-            • تقليل استخدام البيانات الوصفية (Zero Metadata).<br>
-            • تشغيل برمجيات مفتوحة المصدر وموثوقة.<br>
-            • المحتوى القانوني فقط واحترام الخصوصية.
-        </div>
-        <button class="btn-primary" onclick="showNotificationModal()">اقبل واصل</button>
-    </div>
-
-    <!-- 3. شاشة إنشاء الملف -->
-    <div class="screen" id="screen-profile">
-        <div class="brand-logo">words</div>
-        <div class="hero-img" style="width: 90px; height: 90px; font-size: 2.2rem; margin-top: 10px;">👤</div>
-        <h2 class="title-primary">ملف تعريفك</h2>
-        <p class="subtitle">على جوالك فقط، وليس على الخوادم.<br>لا حساب، لا رقم هاتف، لا بريد إلكتروني.</p>
-        <div class="input-group">
-            <input type="text" id="profileName" class="custom-input" placeholder="ادخل اسم ملف التعريف..." />
-        </div>
-        <button class="btn-primary" onclick="saveProfileAndGoHome()">أنشئ ملف تعريف</button>
-    </div>
-
-    <!-- 4. الشاشة الرئيسية -->
-    <div class="screen" id="screen-main">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div class="brand-logo" style="font-size: 1.6rem;">words</div>
-            <div style="display:flex; align-items:center; gap:8px;">
-                <button class="btn-install installBtnDynamic" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
-                <span id="displayUserName" style="font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
-            </div>
-        </div>
-
-        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 10px;">تحدث مع شخص ما في words</p>
-
-        <div class="action-card" onclick="openChat('رابط خاص')">
-            <div class="action-icon">🔗</div>
-            <div class="action-text">
-                <span class="action-title">أنشئ رابطاً خاصاً</span>
-                <span class="action-desc">رابط اتصال مخصص لشخص واحد</span>
-            </div>
-        </div>
-
-        <div class="action-card" onclick="openChat('رابط عام')">
-            <div class="action-icon">🌐</div>
-            <div class="action-text">
-                <span class="action-title">أنشئ رابطك العام</span>
-                <span class="action-desc">لكي يتمكن أي شخص من الوصول إليك</span>
-            </div>
-        </div>
-
-        <div class="action-card" onclick="openChat('مجموعة جديدة')">
-            <div class="action-icon">👥</div>
-            <div class="action-text">
-                <span class="action-title">أنشئ مجموعة words</span>
-                <span class="action-desc">محادثة جماعية مشفرة بين أطراف متعددة</span>
-            </div>
-        </div>
-
-        <div class="action-card" onclick="openChat('قناة عامة')">
-            <div class="action-icon">📢</div>
-            <div class="action-text">
-                <span class="action-title">أنشئ قناة عامة</span>
-                <span class="action-desc">بث الرسائل لعدد غير محدود من المتابعين</span>
-            </div>
-        </div>
-
-        <div class="action-card" onclick="nextScreen('screen-video')">
-            <div class="action-icon" style="background:#fef3c7; color:#d97706;">📹</div>
-            <div class="action-text">
-                <span class="action-title">مكالمة فيديو words</span>
-                <span class="action-desc">اتصال مرئي مباشر عبر WebRTC</span>
-            </div>
-        </div>
-
-        <div style="margin-top: auto; display: flex; gap: 8px;">
-            <input type="text" id="linkInput" class="custom-input" placeholder="ابحث أو الصق رابط words..." style="padding: 12px; margin:0;" />
-            <button class="btn-primary" style="width: auto; padding: 12px 18px;" onclick="connectLink()">ربط</button>
-        </div>
-
-        <div class="quick-nav">
-            <button class="quick-btn active" onclick="nextScreen('screen-main')">الرئيسية</button>
-            <button class="quick-btn" onclick="nextScreen('screen-contacts')">جهات الاتصال</button>
-            <button class="quick-btn" onclick="nextScreen('screen-settings')">الإعدادات</button>
-        </div>
-    </div>
-
-    <!-- 5. جهات الاتصال -->
-    <div class="screen" id="screen-contacts">
-        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">جهات الاتصال والحظر</div>
-        <div style="display:flex; gap:6px; margin-bottom:15px;">
-            <input type="text" id="contactInput" class="custom-input" placeholder="معرف words..." style="margin:0; padding:12px;" />
-            <button class="btn-primary" style="width:auto; padding:12px;" onclick="addContact()">إضافة</button>
-        </div>
-        <div id="contactsList">
-            <div class="action-card">
-                <div class="action-icon">👤</div>
-                <div class="action-text" style="flex:1;">
-                    <span class="action-title">جهة اتصال words</span>
-                    <span class="action-desc">مسار E2EE موجه</span>
-                </div>
-                <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
-            </div>
-        </div>
-        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
-    </div>
-
-    <!-- 6. مكالمة الفيديو -->
-    <div class="screen" id="screen-video">
-        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">مكالمة فيديو words</div>
-        <div style="width:100%; height:160px; background:#0f172a; border-radius:20px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem; margin-bottom:12px;">
-            📹 الكاميرا جاهزة لبدء البث المشفر...
-        </div>
-        <input type="text" class="custom-input" id="callUrl" value="https://hassan2026go.github.io/Rimail/" readonly style="margin-bottom:8px;" />
-        <button class="btn-primary" style="padding:12px;" onclick="openRimailCall()">فتح غرفة Rimail ومشاركة الرابط</button>
-        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
-    </div>
-
-    <!-- 7. لوحة تحكم وإدارة المرحلات والسيرفرات (Admin Node Monitor) -->
-    <div class="screen" id="screen-settings">
-        <div class="brand-logo" style="font-size: 1.4rem; margin-bottom: 10px;">إدارة سيرفرات ومرحلات words</div>
-        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">كمدير، يمكنك إضافة ومراقبة عقد الترحيل (SMP) لاختيار الأسرع:</p>
-        
-        <div style="display:flex; gap:6px; margin-bottom:12px;">
-            <input type="text" id="relayInput" class="custom-input" placeholder="أدخل رابط سيرفر الترحيل (wss://...)" style="margin:0; padding:10px; font-size:0.85rem;" />
-            <button class="btn-primary" style="width:auto; padding:10px 14px; font-size:0.9rem;" onclick="addRelayServer()">إضافة</button>
-        </div>
-
-        <div id="relaysList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
-            <!-- مرحلات مقترحة وأنشطها -->
-            <div class="action-card" style="padding:10px 14px; margin:0;">
-                <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#dcfce7; color:#16a34a;">⚡</div>
-                <div class="action-text" style="flex:1;">
-                    <span class="action-title" style="font-size:0.85rem;">relay-alpha.words-net.org</span>
-                    <span class="action-desc" style="color:#16a34a;">نشط جداً • سرعة: 18ms (الأفضل)</span>
-                </div>
-            </div>
-            <div class="action-card" style="padding:10px 14px; margin:0;">
-                <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#e0f2fe; color:#0284c7;">🟢</div>
-                <div class="action-text" style="flex:1;">
-                    <span class="action-title" style="font-size:0.85rem;">smp-eu.secure-relay.io</span>
-                    <span class="action-desc">مستقر • سرعة: 42ms</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="action-card" onclick="clearData()" style="padding:12px; margin-bottom:10px;">
-            <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#fee2e2; color:#ef4444;">🗑️</div>
-            <div class="action-text">
-                <span class="action-title" style="color:#ef4444; font-size:0.9rem;">مسح السجل وقواعد البيانات</span>
-                <span class="action-desc">إزالة مفاتيح الجلسة المحلية</span>
-            </div>
-        </div>
-
-        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
-    </div>
-
-    <!-- 8. الدردشة المباشرة -->
-    <div class="screen" id="screen-chat">
-        <div class="chat-header">
-            <button style="border:none; background:none; font-size: 1.2rem; cursor:pointer;" onclick="nextScreen('screen-main')">➔</button>
-            <div style="text-align: center;">
-                <span id="chatTitle" style="font-weight: 700; display: block;">محادثة words المشفرة</span>
-                <span style="font-size: 0.75rem; color: #10b981;">مسار words الآمن E2EE مفعل</span>
-            </div>
-            <span style="font-size: 1.2rem;">🔒</span>
-        </div>
-        <div class="chat-messages" id="chatBox">
-            <div class="msg-bubble received">
-                مرحباً بك في منصة words! هذه محادثة مشفرة آمنة وموجهة.
-            </div>
-        </div>
-        <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <input type="text" id="chatInput" class="custom-input" placeholder="اكتب رسالة مشفرة..." style="padding: 12px; margin:0;" />
-            <button class="btn-primary" style="width: auto; padding: 12px 20px;" onclick="sendChatMessage()">إرسال</button>
-        </div>
-    </div>
-
-    <!-- Modal التنبيهات -->
-    <div class="modal" id="customModal">
-        <div class="modal-card">
-            <div style="font-size: 2.2rem; margin-bottom: 8px;">❖</div>
-            <h3 id="modalTitle" style="margin-bottom: 8px;">words</h3>
-            <p id="modalBody" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height:1.5;"></p>
-            <button class="btn-primary" onclick="closeCustomModal()">حسناً</button>
-        </div>
-    </div>
-
-    <!-- Modal الإشعارات -->
-    <div class="modal" id="notificationModal">
-        <div class="modal-card">
-            <div style="font-size: 2.5rem; margin-bottom: 10px;">⚡</div>
-            <h3 style="margin-bottom: 8px;">إشعارات فورية</h3>
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-                لتنسيق الخصوصية، يتم تشغيل words في الخلفية بدلاً من استخدام إشعارات Push التابعة للسيرفرات.
-            </p>
-            <button class="btn-primary" onclick="closeNotificationModal()">موافق ومتابعة</button>
-        </div>
-    </div>
-
+<div id="app">
+  <header><span id="logo"></span><span id="brand">words</span><span style="flex:1"></span><span id="rs" class="s"></span><button class="btn sec sm" id="inst" style="display:none">馃摬 鬲孬亘賷鬲</button></header>
+  <div id="view"></div>
+  <nav id="nav"></nav>
+  <div id="toast"></div>
 </div>
-
+<div id="call"><video id="rv" autoplay playsinline></video><video id="lv" autoplay playsinline muted></video><div class="ctl"><button class="btn sec" id="cmute" style="background:#fff">馃帳</button><button class="btn bad" id="cend">廿賳賴丕亍</button><button class="btn sec" id="ccam" style="background:#fff">馃摲</button></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nostr-tools@2.7.2/lib/nostr.bundle.js"></script>
 <script>
-    let deferredPrompt;
+const NT = window.NostrTools;
+const iconUri='data:image/jpeg;base64,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';
+document.getElementById('logo').innerHTML='<img alt="words" src="'+iconUri+'">';
+(async()=>{ // hosted: real manifest + service worker; otherwise runtime manifest
+  const l=document.createElement('link');l.rel='manifest';
+  let hosted=false; try{hosted=location.protocol.startsWith('http')&&(await fetch('manifest.json',{method:'HEAD'})).ok}catch(e){}
+  if(hosted){l.href='manifest.json';try{navigator.serviceWorker.register('sw.js')}catch(e){}}
+  else{l.href=URL.createObjectURL(new Blob([JSON.stringify({name:'words',short_name:'words',start_url:'.',display:'standalone',background_color:'#e6f0fc',theme_color:'#5b94d3',icons:[{src:iconUri,sizes:'192x192',type:'image/jpeg',purpose:'any'}]})],{type:'application/manifest+json'}))}
+  document.head.append(l);const f=document.createElement('link');f.rel='icon';f.href=iconUri;document.head.append(f);
+})();
 
-    // تفعيل التقاط حدث التثبيت للـ PWA
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        // إظهار أزرار التثبيت فوراً للمستخدم
-        document.querySelectorAll('.installBtnDynamic').forEach(el => el.style.display = 'flex');
-        const mainInstall = document.getElementById('installBtn');
-        if(mainInstall) mainInstall.style.display = 'flex';
-    });
+// ---------- helpers ----------
+const $=s=>document.querySelector(s);
+let locked=false,VK=null,VS=null,mem=null;const PLAIN=['theme'];
+try{locked=!!localStorage.getItem('vault')}catch(e){}
+const store={
+  get(k,d){if(locked&&!PLAIN.includes(k))return d;if(mem&&!PLAIN.includes(k))return k in mem?mem[k]:d;try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){if(locked&&!PLAIN.includes(k))return;if(mem&&!PLAIN.includes(k)){mem[k]=v;flush();return}try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},
+  del(k){if(locked&&!PLAIN.includes(k))return;if(mem&&!PLAIN.includes(k)){delete mem[k];flush();return}try{localStorage.removeItem(k)}catch(e){}}
+};
+const h2b=h=>Uint8Array.from(h.match(/../g).map(x=>parseInt(x,16)));
+const b2h=b=>Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+const rnd=n=>b2h(crypto.getRandomValues(new Uint8Array(n)));
+const now=()=>Math.floor(Date.now()/1000);
+function el(tag,props={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(props)){if(k==='class')e.className=v;else if(k.startsWith('on'))e[k]=v;else e.setAttribute(k,v)}kids.flat().forEach(c=>e.append(c instanceof Node?c:document.createTextNode(String(c))));return e}
+function toast(t){const x=$('#toast');x.textContent=t;x.classList.add('on');setTimeout(()=>x.classList.remove('on'),2400)}
+const short=pk=>NT.nip19.npubEncode(pk).slice(0,12)+'鈥�';
+const base=()=>location.href.split('#')[0];
+const copy=(t,m='鬲賲 丕賱賳爻禺')=>navigator.clipboard?.writeText(t).then(()=>toast(m),()=>toast('鬲毓匕賾乇 丕賱賳爻禺'));
+const share=u=>navigator.share?navigator.share({title:'words',url:u}).catch(()=>{}):copy(u,'鬲賲 賳爻禺 丕賱乇丕亘胤');
+const DEFAULT_RELAYS=['wss://relay.damus.io','wss://nos.lol','wss://relay.primal.net'];
 
-    // دالة تنفيذ التثبيت الفعلي
-    function triggerInstall() {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    hideAllInstallButtons();
-                }
-                deferredPrompt = null;
-            });
-        } else {
-            showCustomAlert("تثبيت تطبيق words", "لتثبيت التطبيق على جهازك السامسونج:\nاضغط على القائمة (⋮) في متصفحك واختار 'إضافة إلى الشاشة الرئيسية' (Add to Home screen).");
-        }
-    }
+// ---------- state ----------
+let sk=null,pk=null,pool=new NT.SimplePool(),sub=null;
+let relays=store.get('relays',DEFAULT_RELAYS),contacts=store.get('contacts',{}),blocked=store.get('blocked',[]),me=store.get('me',{name:''});
+let aliases=store.get('aliases',[]),groups=store.get('groups',{}),chans=store.get('chans',{});
+let msgs=store.get('msgs',{}),seen=new Set(Object.values(store.get('msgs',{})).flat().map(m=>m.id)),unread=store.get('unread',{}),tab='chats',sub2=null,openKey=null,adminOn=false,viewProf=null,fetched=new Set();
+const sv=()=>{store.set('contacts',contacts);store.set('groups',groups);store.set('chans',chans);store.set('aliases',aliases)};
+const ids=()=>[{sk,pk},...aliases.map(a=>({sk:h2b(a.sk),pk:a.pk}))];
+const keyFor=p=>ids().find(i=>i.pk===contacts[p]?.via)||ids()[0];
+function loadKey(){const h=store.get('sk',null);if(h){sk=h2b(h);pk=NT.getPublicKey(sk);return true}return false}
+function saveKey(b){sk=b;pk=NT.getPublicKey(sk);store.set('sk',b2h(sk))}
+function nameOf(k){if(k.startsWith('g:'))return groups[k.slice(2)]?.name||'賲噩賲賵毓丞';if(k.startsWith('c:'))return chans[k.slice(2)]?.name||'賯賳丕丞';return contacts[k]?.name||contacts[k]?.pname||short(k)}
 
-    // إخفاء أزرار التثبيت تلقائياً بعد نجاح التثبيت أو الاستخدام كمنصة مثبتة
-    window.addEventListener('appinstalled', (evt) => {
-        hideAllInstallButtons();
-    });
+// ---------- NIP-44 / NIP-59 (NIP-17 private messages) ----------
+const _n44=NT.nip44||{},_gck=_n44.getConversationKey||_n44.v2?.utils?.getConversationKey||_n44.utils?.v2?.getConversationKey,_enc=_n44.encrypt||_n44.v2?.encrypt,_dec=_n44.decrypt||_n44.v2?.decrypt;
+const e44=(s,p,t)=>_enc(t,_gck(s,p)),d44=(s,p,t)=>_dec(t,_gck(s,p));
+let canWrap=false;try{const a=NT.generateSecretKey(),b=NT.generateSecretKey();canWrap=d44(b,NT.getPublicKey(a),e44(a,NT.getPublicKey(b),'ok'))==='ok'}catch(e){}
+const rndTime=()=>now()-Math.floor(Math.random()*172800);
+function mkRumor(senderSk,kind,tags,content){const r=NT.finalizeEvent({kind,created_at:now(),tags,content},senderSk);delete r.sig;return r}
+function wrap(rumor,senderSk,toPk){
+  const seal=NT.finalizeEvent({kind:13,created_at:rndTime(),tags:[],content:e44(senderSk,toPk,JSON.stringify(rumor))},senderSk);
+  const w=NT.generateSecretKey();
+  return NT.finalizeEvent({kind:1059,created_at:rndTime(),tags:[['p',toPk]],content:e44(w,toPk,JSON.stringify(seal))},w);
+}
+function unwrap(ev){
+  const P=(ev.tags.find(t=>t[0]==='p')||[])[1],idn=ids().find(i=>i.pk===P);if(!idn)return null;
+  const seal=JSON.parse(d44(idn.sk,ev.pubkey,ev.content));if(seal.kind!==13||!NT.verifyEvent(seal))return null;
+  const r=JSON.parse(d44(idn.sk,seal.pubkey,seal.content));if(r.pubkey!==seal.pubkey)return null;
+  return{r,idn};
+}
+// ---------- app lock: AES-GCM vault (PBKDF2 key) ----------
+const enc=new TextEncoder(),dec=new TextDecoder();
+const b64=b=>{b=new Uint8Array(b);let s='';for(let i=0;i<b.length;i+=8192)s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));return btoa(s)};
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function deriveKey(pw,salt){const m=await crypto.subtle.importKey('raw',enc.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:300000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function save(){if(!VK||!mem)return;const iv=crypto.getRandomValues(new Uint8Array(12)),ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},VK,enc.encode(JSON.stringify(mem)));try{localStorage.setItem('vault',JSON.stringify({s:b64(VS),i:b64(iv),c:b64(ct)}))}catch(e){}}
+let ft;const flush=()=>{clearTimeout(ft);ft=setTimeout(save,500)};
+const VKEYS=['sk','contacts','blocked','me','relays','aliases','groups','chans','msgs','unread','admPk','cfg','opt'];
+async function enableLock(pw){
+  const snap={};VKEYS.forEach(k=>{const v=store.get(k,undefined);if(v!==undefined)snap[k]=v});
+  VS=crypto.getRandomValues(new Uint8Array(16));VK=await deriveKey(pw,VS);mem=snap;await save();
+  VKEYS.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+}
+async function changePw(pw){VS=crypto.getRandomValues(new Uint8Array(16));VK=await deriveKey(pw,VS);await save()}
+async function disableLock(){for(const k in mem){try{localStorage.setItem(k,JSON.stringify(mem[k]))}catch(e){}}try{localStorage.removeItem('vault')}catch(e){}VK=VS=mem=null}
+async function unlock(pw){
+  try{const v=JSON.parse(localStorage.getItem('vault')),salt=unb64(v.s),k=await deriveKey(pw,salt);
+    const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:unb64(v.i)},k,unb64(v.c));mem=JSON.parse(dec.decode(pt));VK=k;VS=salt;return true}catch(e){return false}
+}
+function initState(){relays=store.get('relays',DEFAULT_RELAYS);contacts=store.get('contacts',{});blocked=store.get('blocked',[]);me=store.get('me',{name:''});aliases=store.get('aliases',[]);groups=store.get('groups',{});chans=store.get('chans',{});msgs=store.get('msgs',{});seen=new Set(Object.values(msgs).flat().map(m=>m.id));unread=store.get('unread',{});admPk=store.get('admPk',PLATFORM_ADMIN);cfg=store.get('cfg',{});opt=store.get('opt',{plat:true,ban:true,ice:[]})}
+function afterUnlock(){locked=false;initState();if(loadKey())startSub();syncCfg();render();if(sk&&location.hash.length>1)connect(location.hash.slice(1))}
+async function lockNow(){
+  if(!VK)return;if(pc)return toast('兀賳賴賽 丕賱賲賰丕賱賲丞 兀賵賱丕賸');
+  clearTimeout(pt);await save();try{sub&&sub.close()}catch(e){}
+  locked=true;VK=VS=mem=null;sk=pk=null;openKey=null;viewProf=null;adminOn=false;tab='chats';initState();render();
+}
+let tries=0;
+function renderUnlock(v){
+  const pw=el('input',{type:'password',placeholder:'賰賱賲丞 丕賱賲乇賵乇'}),go=async()=>{
+    if(tries>=3)await new Promise(r=>setTimeout(r,Math.min(30000,1000*2**(tries-2))));
+    if(await unlock(pw.value)){tries=0;afterUnlock()}else{tries++;toast('賰賱賲丞 丕賱賲乇賵乇 睾賷乇 氐丨賷丨丞')}};
+  pw.onkeydown=e=>{if(e.key==='Enter')go()};
+  v.append(el('h2',{},'馃攼 丕賱鬲胤亘賷賯 賲賯賮賱'),el('p',{class:'s w'},'兀丿禺賱 賰賱賲丞 丕賱賲乇賵乇 賱賮賰 鬲卮賮賷乇 賲賮鬲丕丨賰 賵乇爻丕卅賱賰.'),pw,el('button',{class:'btn',onclick:go},'賮鬲丨'),
+    el('button',{class:'btn sec sm',style:'margin-top:20px',onclick:()=>{if(confirm('爻賷購丨匕賮 賰賱 卮賷亍 賲賳 賴匕丕 丕賱噩賴丕夭 賳賴丕卅賷丕賸. 爻鬲丨鬲丕噩 nsec 賱賱丕爻鬲乇噩丕毓.')){try{localStorage.clear()}catch(e){}location.reload()}}},'賳爻賷鬲 賰賱賲丞 丕賱賲乇賵乇責 賲爻丨 丕賱噩賴丕夭'));
+}
+function lockCard(){
+  const c=el('div',{class:'card',style:'display:flex;flex-direction:column;gap:8px'},el('div',{class:'t'},'馃攼 丕賱兀賲丕賳'),
+    el('div',{class:'s w'},canWrap?'丕賱鬲卮賮賷乇: NIP-17 (NIP-44 賲毓 Gift Wrap): 丕賱賲乇丨賾賱丕鬲 賱丕 鬲乇賶 丕賱賲乇爻賱 賵賱丕 丕賱賲爻鬲賱賲 丕賱丨賯賷賯賷.':'鬲賳亘賷賴: 丕賱賲鬲氐賮丨 賱丕 賷丿毓賲 NIP-44貙 鬲購爻鬲禺丿賲 乇爻丕卅賱 NIP-04 丕賱賯丿賷賲丞.'));
+  if(!VK){
+    const p1=el('input',{type:'password',placeholder:'賰賱賲丞 賲乇賵乇 (8 兀丨乇賮 兀賵 兀賰孬乇)'}),p2=el('input',{type:'password',placeholder:'兀毓丿 賰鬲丕亘鬲賴丕'});
+    c.append(el('div',{class:'s w'},'丕賱賯賮賱 賷卮賮賾乇 丕賱賲賮鬲丕丨 丕賱爻乇賷 賵丕賱乇爻丕卅賱 賵噩賴丕鬲 丕賱丕鬲氐丕賱 毓賱賶 賴匕丕 丕賱噩賴丕夭. 賱丕 賷賲賰賳 丕爻鬲乇噩丕毓 賰賱賲丞 丕賱賲乇賵乇 廿賳 賳爻賷鬲賴丕.'),p1,p2,
+      el('button',{class:'btn',onclick:async()=>{if(p1.value.length<8)return toast('8 兀丨乇賮 毓賱賶 丕賱兀賯賱');if(p1.value!==p2.value)return toast('賰賱賲鬲丕 丕賱賲乇賵乇 睾賷乇 賲鬲胤丕亘賯鬲賷賳');await enableLock(p1.value);toast('賮購毓賾賱 丕賱賯賮賱');render()}},'鬲賮毓賷賱 丕賱賯賮賱'));
+  }else{
+    const o1=el('input',{type:'password',placeholder:'賰賱賲丞 賲乇賵乇 噩丿賷丿丞'});
+    c.append(el('div',{class:'s'},'丕賱賯賮賱 賲賮毓賾賱 鉁� 鈥� 賷購賯賮賱 鬲賱賯丕卅賷丕賸 亘毓丿 丕賱禺乇賵噩 賲賳 丕賱鬲胤亘賷賯:'),
+      el('div',{class:'flex',style:'flex-wrap:wrap'},...[1,5,15].map(m=>el('button',{class:'btn sm '+((opt.lockMin||1)===m?'':'sec'),onclick:()=>{opt.lockMin=m;store.set('opt',opt);render()}},m+' 丿'))),
+      el('button',{class:'btn sec sm',onclick:()=>lockNow()},'馃敀 賯賮賱 丕賱丌賳'),o1,
+      el('button',{class:'btn sec sm',onclick:async()=>{if(o1.value.length<8)return toast('8 兀丨乇賮 毓賱賶 丕賱兀賯賱');await changePw(o1.value);o1.value='';toast('鬲賲 丕賱鬲睾賷賷乇')}},'鬲睾賷賷乇 賰賱賲丞 丕賱賲乇賵乇'),
+      el('button',{class:'btn bad sm',onclick:async()=>{await disableLock();toast('兀購賱睾賷 丕賱賯賮賱');render()}},'廿賱睾丕亍 丕賱賯賮賱 (鬲購鬲乇賰 丕賱亘賷丕賳丕鬲 丿賵賳 鬲卮賮賷乇)'));
+  }
+  return c;
+}
+let hiddenAt=0;document.addEventListener('visibilitychange',()=>{if(document.hidden)hiddenAt=Date.now();else if(VK&&hiddenAt&&Date.now()-hiddenAt>(opt.lockMin||1)*60000)lockNow()});
+// ---------- profiles ----------
+const okPic=u=>typeof u==='string'&&u.length<60000&&/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/.test(u);
+function pickAvatar(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=()=>rej();fr.onload=()=>{const img=new Image();img.onerror=()=>rej();img.onload=()=>{
+  const S=192,c=document.createElement('canvas');c.width=c.height=S;const m=Math.min(img.width,img.height);
+  c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,S,S);
+  let q=.82,d=c.toDataURL('image/jpeg',q);while(d.length>16000&&q>.3){q-=.1;d=c.toDataURL('image/jpeg',q)}res(d)};img.src=fr.result};fr.readAsDataURL(file)})}
+function avEl(k,sz){
+  const a=el('div',{class:'av'});if(sz)a.style.cssText=`width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.45)}px`;
+  if(k.startsWith('g:'))a.append('馃懃');else if(k.startsWith('c:'))a.append('馃摙');
+  else{const c=contacts[k];if(okPic(c&&c.picture))a.append(el('img',{src:c.picture,alt:''}));else a.append([...nameOf(k)][0]||'?')}
+  return a}
+function profileCard(){
+  const nm=el('input',{placeholder:'丕賱丕爻賲 丕賱賲毓乇賵囟',value:me.name||'',maxlength:'40'}),ab=el('textarea',{placeholder:'賳亘匕丞 毓賳賰 (丕禺鬲賷丕乇賷)',maxlength:'160',style:'min-height:64px'},me.about||'');
+  const av=el('div',{class:'av lg',style:'cursor:pointer'}),draw=()=>{av.replaceChildren();if(me.picture)av.append(el('img',{src:me.picture,alt:''}));else av.append([...(me.name||'?')][0])};draw();
+  const f=el('input',{type:'file',accept:'image/*',style:'display:none'});
+  f.onchange=async()=>{const x=f.files[0];if(!x)return;try{me.picture=await pickAvatar(x);draw();toast('丕禺鬲賷乇鬲 丕賱氐賵乇丞. 丕囟睾胤 芦丨賮馗 賵賳卮乇禄')}catch(e){toast('鬲毓匕賾乇 賯乇丕亍丞 丕賱氐賵乇丞')}f.value=''};
+  av.onclick=()=>f.click();
+  return el('div',{class:'card',style:'display:flex;flex-direction:column;gap:8px'},el('div',{class:'t'},'丕賱賲賱賮 丕賱卮禺氐賷'),
+    el('div',{class:'flex'},av,el('div',{class:'grow s w'},'丕囟睾胤 毓賱賶 丕賱氐賵乇丞 賱鬲睾賷賷乇賴丕. 鬲購賯氐賾 賲乇亘毓丞 賵鬲購氐睾賻賾乇 鬲賱賯丕卅賷丕賸.')),f,nm,ab,
+    el('div',{class:'flex'},el('button',{class:'btn grow',onclick:async()=>{me.name=nm.value.trim();me.about=ab.value.trim();store.set('me',me);const ok=await publishProfile();toast(ok?'賳購卮乇 賲賱賮賰 丕賱卮禺氐賷':'丨購賮馗 賲丨賱賷丕賸 賵鬲毓匕賾乇 丕賱賳卮乇')}},'丨賮馗 賵賳卮乇'),
+      el('button',{class:'btn sec',onclick:()=>{me.picture='';draw()}},'廿夭丕賱丞 丕賱氐賵乇丞')),
+    el('p',{class:'s w'},'丕賱賲賱賮 丕賱卮禺氐賷 毓丕賲: 賷乇丕賴 賰賱 賲賳 賷毓乇賮 賲毓乇賾賮賰 毓賱賶 丕賱賲乇丨賾賱丕鬲.'));
+}
+function renderProfView(v){
+  const k=viewProf,c=contacts[k]||{},npub=NT.nip19.npubEncode(k),rn=el('input',{placeholder:'丕爻賲 賲丨賱賷 (賷馗賴乇 賱賰 賮賯胤)',value:c.name||''});
+  v.append(el('button',{class:'btn sec sm',style:'align-self:flex-start',onclick:()=>{viewProf=null;render()}},'鉃� 乇噩賵毓'),
+    el('div',{style:'display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center'},avEl(k,96),el('div',{class:'t',style:'font-size:1.2rem'},nameOf(k)),c.about?el('div',{class:'s w'},c.about):''),
+    el('div',{class:'card'},el('div',{class:'t'},'丕賱賲毓乇賾賮'),el('div',{class:'mono'},npub),el('button',{class:'btn sec sm',style:'margin-top:6px',onclick:()=>copy(npub)},'賳爻禺')),
+    el('div',{class:'flex'},rn,el('button',{class:'btn',onclick:()=>{(contacts[k]||={}).name=rn.value.trim();sv();render()}},'丨賮馗')),
+    el('div',{class:'flex'},el('button',{class:'btn grow',onclick:()=>{viewProf=null;openKey=k;render()}},'賲乇丕爻賱丞'),el('button',{class:'btn sec grow',onclick:()=>fetchName(k)},'鈫� 鬲丨丿賷孬 丕賱賲賱賮'),
+      el('button',{class:'btn bad grow',onclick:()=>{if(confirm('丨馗乇 賴匕賴 丕賱噩賴丞責')){blocked.push(k);store.set('blocked',blocked);viewProf=null;openKey=null;render()}}},'丨馗乇')));
+}
+// ---------- network ----------
+function startSub(){
+  if(sub){try{sub.close()}catch(e){}}
+  const since=now()-30*86400,P=ids().map(i=>i.pk),cids=Object.keys(chans);
+  const f=[{kinds:[4],'#p':P,since},{kinds:[4],authors:P,since},{kinds:[1059],'#p':P,since:since-172800}];
+  if(cids.length)f.push({kinds:[42],'#e':cids,since});
+  sub=pool.subscribeMany(R(),f,{onevent:onEvent,onauth:t=>NT.finalizeEvent(t,sk)});
+}
+function resolve(ev){
+  const pt=(ev.tags.find(t=>t[0]==='p')||[])[1],mine=ids().find(i=>i.pk===ev.pubkey),idn=mine||ids().find(i=>i.pk===pt);
+  return idn?{idn,other:mine?pt:ev.pubkey,mine:!!mine}:null;
+}
+function push(key,m){
+  (msgs[key]||=[]).push(m);msgs[key].sort((a,b)=>a.t-b.t);if(!m.mine&&openKey!==key){unread[key]=(unread[key]||0)+1;store.set('unread',unread)}persist();
+  if(!m.mine&&document.hidden&&window.Notification&&Notification.permission==='granted')new Notification(nameOf(key),{body:m.text});
+  if(openKey===key)drawMsgs();else if(!openKey&&tab==='chats')render();
+}
+async function onEvent(ev){
+  if(seen.has(ev.id))return;seen.add(ev.id);
+  if(ev.kind===42){
+    const cid=(ev.tags.find(t=>t[0]==='e')||[])[1],c=chans[cid];if(!c||isB(ev.pubkey))return;
+    if(c.broadcast&&ev.pubkey!==c.owner)return;
+    return push('c:'+cid,{id:ev.id,mine:ev.pubkey===pk,text:ev.content,t:ev.created_at,from:ev.pubkey});
+  }
+  if(ev.kind===1059){let u;try{u=unwrap(ev)}catch(e){return}if(!u)return;return onRumor(u.r,u.idn)}
+  const r=resolve(ev);if(!r||isB(r.other))return;
+  let text;try{text=await NT.nip04.decrypt(r.idn.sk,r.other,ev.content)}catch(e){return}
+  const uid=(ev.tags.find(t=>t[0]==='u')||[])[1]||ev.id;if(seen.has(uid)&&uid!==ev.id)return;seen.add(uid);
+  const g=ev.tags.find(t=>t[0]==='g');
+  deliver({id:uid,mine:r.mine,text,t:ev.created_at,sender:r.mine?pk:ev.pubkey,other:r.other,idn:r.idn,gid:g&&g[1],gname:(ev.tags.find(t=>t[0]==='gn')||[])[1],members:ev.tags.filter(t=>t[0]==='m').map(t=>t[1])});
+}
+function onRumor(r,idn){
+  const mine=ids().some(i=>i.pk===r.pubkey);
+  if(r.kind===25050){if(mine||now()-r.created_at>60||isB(r.pubkey))return;return onSignal({other:r.pubkey,mine:false,idn},r.content)}
+  if(r.kind!==14||seen.has(r.id))return;seen.add(r.id);
+  const g=r.tags.find(t=>t[0]==='g'),ps=r.tags.filter(t=>t[0]==='p').map(t=>t[1]);
+  const other=mine?(ps.find(p=>!ids().some(i=>i.pk===p))||ps[0]):r.pubkey;
+  if(isB(r.pubkey)||(!g&&isB(other)))return;
+  deliver({id:r.id,mine,text:r.content,t:r.created_at,sender:r.pubkey,other,idn,gid:g&&g[1],gname:(r.tags.find(t=>t[0]==='subject')||[])[1],members:ps});
+}
+function deliver(m){
+  let key;
+  if(m.gid){
+    if(groups[m.gid]&&!groups[m.gid].members.includes(m.sender))return;
+    if(!groups[m.gid]){groups[m.gid]={name:m.gname||'賲噩賲賵毓丞',members:[...new Set(m.members)]};sv()}
+    key='g:'+m.gid;
+  }else{
+    key=m.other;if(!contacts[key]){contacts[key]={name:''};fetchName(key)}
+    if(m.idn.pk!==pk&&contacts[key].via!==m.idn.pk)contacts[key].via=m.idn.pk;sv();
+  }
+  push(key,{id:m.id,mine:m.mine,text:m.text,t:m.t,from:m.sender});
+}
+async function fetchName(p){try{const e=await pool.get(R(),{kinds:[0],authors:[p]});if(!e)return;const j=JSON.parse(e.content),c=contacts[p]||={};c.pname=String(j.display_name||j.name||'').slice(0,60);c.about=String(j.about||'').slice(0,300);c.picture=okPic(j.picture)?j.picture:'';sv();if(viewProf===p||(!openKey&&tab==='chats'))render()}catch(e){}}
+async function publish(ev){try{await Promise.any(pool.publish(R(),ev));return true}catch(e){return false}}
+const publishProfile=()=>publish(NT.finalizeEvent({kind:0,created_at:now(),tags:[],content:JSON.stringify({name:me.name||'',display_name:me.name||'',about:me.about||'',picture:me.picture||''})},sk));
+const pubAll=async evs=>(await Promise.all(evs.map(publish))).every(Boolean);
+async function send(key,text){
+  if(key.startsWith('c:')||!canWrap)return sendLegacy(key,text);
+  let ok;
+  if(key.startsWith('g:')){
+    const gid=key.slice(2),G=groups[gid],r=mkRumor(sk,14,[['g',gid],['subject',G.name],...G.members.map(m=>['p',m])],text);seen.add(r.id);
+    push(key,{id:r.id,mine:true,text,t:r.created_at,from:pk});ok=await pubAll(G.members.map(m=>wrap(r,sk,m)));
+  }else{
+    const k=keyFor(key),r=mkRumor(k.sk,14,[['p',key]],text);seen.add(r.id);
+    push(key,{id:r.id,mine:true,text,t:r.created_at,from:pk});ok=await pubAll([wrap(r,k.sk,key),wrap(r,k.sk,k.pk)]);
+  }
+  if(!ok)toast('鬲毓匕賾乇 丕賱廿乇爻丕賱: 賱丕 賷賵噩丿 賲乇丨賾賱 賲鬲丕丨');
+}
+async function sendLegacy(key,text){
+  let ok=true;
+  if(key.startsWith('c:')){
+    const ev=NT.finalizeEvent({kind:42,created_at:now(),tags:[['e',key.slice(2),'','root']],content:text},sk);seen.add(ev.id);
+    push(key,{id:ev.id,mine:true,text,t:ev.created_at,from:pk});ok=await publish(ev);
+  }else if(key.startsWith('g:')){
+    const gid=key.slice(2),G=groups[gid],uid=rnd(8);seen.add(uid);push(key,{id:uid,mine:true,text,t:now(),from:pk});
+    const res=await Promise.all(G.members.filter(m=>m!==pk).map(async m=>{
+      const ev=NT.finalizeEvent({kind:4,created_at:now(),tags:[['p',m],['g',gid],['gn',G.name],['u',uid],...G.members.map(x=>['m',x])],content:await NT.nip04.encrypt(sk,m,text)},sk);seen.add(ev.id);return publish(ev)}));
+    ok=res.every(Boolean);
+  }else{
+    const k=keyFor(key),ev=NT.finalizeEvent({kind:4,created_at:now(),tags:[['p',key]],content:await NT.nip04.encrypt(k.sk,key,text)},k.sk);seen.add(ev.id);
+    push(key,{id:ev.id,mine:true,text,t:ev.created_at,from:pk});ok=await publish(ev);
+  }
+  if(!ok)toast('鬲毓匕賾乇 丕賱廿乇爻丕賱: 賱丕 賷賵噩丿 賲乇丨賾賱 賲鬲丕丨');
+}
+function parseId(s){s=s.trim().replace(/^nostr:/,'');const m=s.match(/npub1[a-z0-9]+/);if(m)s=m[0];try{if(s.startsWith('npub'))return NT.nip19.decode(s).data}catch(e){}return /^[0-9a-f]{64}$/i.test(s)?s.toLowerCase():null}
+async function connect(s){
+  const c=s.match(/c-([0-9a-f]{64})/);
+  if(c){const id=c[1];if(!chans[id]){try{const e=await pool.get(R(),{kinds:[40],ids:[id]});if(!e)return toast('賱賲 賷鬲賲 丕賱毓孬賵乇 毓賱賶 丕賱賯賳丕丞');const j=JSON.parse(e.content);chans[id]={name:j.name||'賯賳丕丞',owner:e.pubkey,broadcast:!!j.broadcast};sv();startSub()}catch(e){return toast('賮卮賱 丕賱丕鬲氐丕賱 亘丕賱賲乇丨賾賱丕鬲')}}openKey='c:'+id;return render()}
+  const p=parseId(s);if(!p)return toast('乇丕亘胤 兀賵 賲毓乇賾賮 睾賷乇 氐丕賱丨');if(ids().some(i=>i.pk===p))return toast('賴匕丕 賲毓乇賾賮賰 兀賳鬲');
+  if(!contacts[p]){contacts[p]={name:''};sv();fetchName(p)}openKey=p;render();
+}
+function testRelay(url){return new Promise(res=>{const t0=performance.now();let d=false,w;const fin=v=>{if(!d){d=true;try{w.close()}catch(e){}res(v)}};try{w=new WebSocket(url)}catch(e){return res(null)}w.onopen=()=>fin(Math.round(performance.now()-t0));w.onerror=()=>fin(null);setTimeout(()=>fin(null),5000)})}
 
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        hideAllInstallButtons();
-    }
+// ---------- platform config: signed by the platform admin, fetched from relays ----------
+const PLATFORM_ADMIN=''; // 囟毓 賴賳丕 賲賮鬲丕丨 賲丿賷乇 丕賱賲賳氐丞 (hex) 賯亘賱 丕賱鬲賵夭賷毓 賱賷孬賯 亘賴 賰賱 丕賱賲爻鬲禺丿賲賷賳
+let admPk=store.get('admPk',PLATFORM_ADMIN),cfg=store.get('cfg',{}),opt=store.get('opt',{plat:true,ban:true,ice:[]});
+const R=()=>[...new Set([...relays,...(opt.plat!==false?cfg.relays||[]:[])])];
+const isB=p=>blocked.includes(p)||(opt.ban!==false&&(cfg.banned||[]).includes(p));
+const parseIce=t=>t.split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{const[u,n,c]=l.split('|');return n?{urls:u,username:n,credential:c||''}:{urls:u}});
+const iceList=()=>[...(opt.ice||[]),...(opt.plat!==false?cfg.ice||[]:[]),{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:'stun:stun.nextcloud.com:443'}];
+let pt;const persist=()=>{clearTimeout(pt);pt=setTimeout(()=>{const o={};for(const k in msgs)o[k]=msgs[k].slice(-200);store.set('msgs',o)},800)};
+async function syncCfg(manual){
+  if(!admPk)return manual&&toast('賱賲 賷購丨丿賻賾丿 賲賮鬲丕丨 賲丿賷乇 丕賱賲賳氐丞');
+  try{const e=await pool.get(R(),{kinds:[30078],authors:[admPk],'#d':['words-config']});
+    if(!e||!NT.verifyEvent(e))return manual&&toast('賱丕 鬲賵噩丿 廿毓丿丕丿丕鬲 賲賳卮賵乇丞');
+    if(e.created_at>=(cfg.t||0)){cfg={...JSON.parse(e.content),t:e.created_at};store.set('cfg',cfg);startSub();if(!openKey&&tab==='chats')render()}
+    if(manual)toast('鬲賲 噩賱亘 廿毓丿丕丿丕鬲 丕賱賲賳氐丞')}catch(e){manual&&toast('賮卮賱 噩賱亘 丕賱廿毓丿丕丿丕鬲')}
+}
+async function discover(){
+  const evs=await pool.querySync(R(),{kinds:[10002],limit:400}),c={};
+  evs.forEach(e=>e.tags.forEach(t=>{if(t[0]==='r'&&/^wss:\/\/[^\s]+$/.test(t[1])&&t[2]!=='read'){const u=t[1].replace(/\/+$/,'');c[u]=(c[u]||0)+1}}));
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,20).map(x=>x[0]);
+  const r=await Promise.all(top.map(async u=>[u,await testRelay(u)]));
+  return r.filter(x=>x[1]!==null).sort((a,b)=>a[1]-b[1]).slice(0,8);
+}
+async function addDiscovered(b){b.disabled=true;b.textContent='噩丕乇賺 丕賱亘丨孬鈥�';try{const r=await discover();let n=0;r.forEach(([u])=>{if(!relays.includes(u)){relays.push(u);n++}});store.set('relays',relays);startSub();toast(`兀購囟賷賮 ${n} 賲乇丨賾賱 賲賳 兀爻乇毓 丕賱賲乇丨賾賱丕鬲 丕賱毓丕賲丞`)}catch(e){toast('賮卮賱 丕賱丕賰鬲卮丕賮')}b.disabled=false;b.textContent='馃攷 丕賰鬲卮丕賮 兀爻乇毓 丕賱賲乇丨賾賱丕鬲 丕賱毓丕賲丞'}
+function qrBox(t){const d=el('div',{style:'background:#fff;padding:10px;border-radius:12px;align-self:center'});try{new QRCode(d,{text:t,width:190,height:190})}catch(e){d.textContent='QR 睾賷乇 賲鬲丕丨'}return d}
+const chk=(v,f)=>{const c=el('input',{type:'checkbox',style:'width:auto'});c.checked=v;c.onchange=()=>{f(c.checked);store.set('opt',opt);startSub()};return c};
+const bk=()=>JSON.stringify({sk:b2h(sk),contacts,groups,chans,aliases,blocked,me,relays,opt});
+function restore(t){try{const d=JSON.parse(t);if(!/^[0-9a-f]{64}$/.test(d.sk))throw 0;store.set('sk',d.sk);store.set('contacts',d.contacts||{});store.set('groups',d.groups||{});store.set('chans',d.chans||{});store.set('aliases',d.aliases||[]);store.set('blocked',d.blocked||[]);store.set('me',d.me||{});store.set('relays',d.relays||DEFAULT_RELAYS);store.set('opt',d.opt||{plat:true,ban:true,ice:[]});location.reload()}catch(e){toast('丕賱賳爻禺丞 丕賱丕丨鬲賷丕胤賷丞 睾賷乇 氐丕賱丨丞')}}
+function renderAdminPlat(v){
+  const ta=(val,ph,h)=>el('textarea',{dir:'ltr',placeholder:ph,style:h||''},val),L=t=>t.value.split('\n').map(x=>x.trim()).filter(Boolean);
+  const ap=el('input',{placeholder:'npub 賲丿賷乇 丕賱賲賳氐丞',dir:'ltr',value:admPk?NT.nip19.npubEncode(admPk):''});
+  const an=el('input',{placeholder:'廿毓賱丕賳 賷馗賴乇 賱賰賱 丕賱賲爻鬲禺丿賲賷賳 (丕禺鬲賷丕乇賷)',value:cfg.announce||''});
+  const rl=ta((cfg.relays||[]).join('\n'),'wss://鈥� 賲乇丨賾賱 賲賳氐丞 賱賰賱 爻胤乇');
+  const ic=ta((cfg.ice||[]).map(s=>s.username?`${s.urls}|${s.username}|${s.credential}`:s.urls).join('\n'),'stun:host:3478\nturn:host:3478|user|pass');
+  const bn=ta((cfg.banned||[]).map(p=>NT.nip19.npubEncode(p)).join('\n'),'npub 賲丨馗賵乇 毓賱賶 賲爻鬲賵賶 丕賱賲賳氐丞');
+  const fc=ta((cfg.channels||[]).map(c=>c.id+'|'+c.name).join('\n'),'賲毓乇賾賮 丕賱賯賳丕丞|丕賱丕爻賲');
+  const lic=ta((opt.ice||[]).map(s=>s.username?`${s.urls}|${s.username}|${s.credential}`:s.urls).join('\n'),'禺賵丕丿賲 賲賰丕賱賲丕鬲 賱噩賴丕夭賰 賮賯胤: turn:host:3478|user|pass');
+  v.append(el('h2',{},'廿丿丕乇丞 丕賱賲賳氐丞 丕賱毓丕賲丞'),el('p',{class:'s w'},'丕賱廿毓丿丕丿丕鬲 賴賳丕 鬲賵賯賻賾毓 亘賲賮鬲丕丨 丕賱賲丿賷乇 賵鬲購賳卮乇 賰丨丿孬 Nostr 毓丕賲貙 賮賷噩賱亘賴丕 賰賱 丕賱賲爻鬲禺丿賲賷賳 賵賷鬲丨賯賯 鬲胤亘賷賯賴賲 賲賳 丕賱鬲賵賯賷毓. 賱丕 禺丕丿賲 賲乇賰夭賷. 鬲賳亘賷賴: 丕賱賲丨鬲賵賶 毓賱賳賷貙 賮丕爻鬲禺丿賲 亘賷丕賳丕鬲 TURN 賲丨丿賵丿丞 丕賱氐賱丕丨賷丞.'),
+    el('div',{class:'card',style:'display:flex;flex-direction:column;gap:8px'},el('div',{class:'t'},'賲賮鬲丕丨 賲丿賷乇 丕賱賲賳氐丞'),ap,el('div',{class:'flex'},el('button',{class:'btn sm',onclick:()=>{const p=parseId(ap.value);if(!p)return toast('賲毓乇賾賮 睾賷乇 氐丕賱丨');admPk=p;store.set('admPk',p);toast('丕毓鬲購賲丿 賲丿賷乇 丕賱賲賳氐丞');syncCfg(true)}},'丕毓鬲賲丕丿'),el('button',{class:'btn sec sm',onclick:()=>{admPk=pk;store.set('admPk',pk);ap.value=NT.nip19.npubEncode(pk);toast('賲賮鬲丕丨賰 丕賱丌賳 賲丿賷乇 丕賱賲賳氐丞')}},'丕毓鬲賲丿 賲賮鬲丕丨賷'),el('button',{class:'btn sec sm',onclick:()=>syncCfg(true)},'鈫� 噩賱亘')),el('div',{class:'s w'},'賱賱鬲賵夭賷毓: 囟毓 丕賱賲賮鬲丕丨 (hex) 賮賷 孬丕亘鬲 PLATFORM_ADMIN 丿丕禺賱 丕賱賰賵丿: '+(admPk||'鈥�'))),
+    an,el('div',{class:'t'},'賲乇丨賾賱丕鬲 丕賱賲賳氐丞'),rl,el('div',{class:'t'},'禺賵丕丿賲 丕賱賲賰丕賱賲丕鬲 (STUN/TURN)'),ic,el('div',{class:'t'},'丨馗乇 毓賱賶 賲爻鬲賵賶 丕賱賲賳氐丞'),bn,el('div',{class:'t'},'賯賳賵丕鬲 賲賯鬲乇丨丞'),fc,
+    el('button',{class:'btn',onclick:async()=>{
+      if(!admPk)return toast('丨丿賾丿 賲賮鬲丕丨 丕賱賲丿賷乇 兀賵賱丕賸');let key=sk;
+      if(pk!==admPk){const s=prompt('丕賱氐賯 nsec 賲丿賷乇 丕賱賲賳氐丞 賱賱鬲賵賯賷毓 (賱丕 賷購禺夭賻賾賳)');try{const x=NT.nip19.decode((s||'').trim());if(x.type!=='nsec'||NT.getPublicKey(x.data)!==admPk)throw 0;key=x.data}catch(e){return toast('丕賱賲賮鬲丕丨 賱丕 賷胤丕亘賯 賲丿賷乇 丕賱賲賳氐丞')}}
+      const bad=L(bn).map(parseId);if(bad.includes(null))return toast('賲毓乇賾賮 賲丨馗賵乇 睾賷乇 氐丕賱丨');const rs=L(rl);if(rs.some(u=>!/^wss?:\/\//.test(u)))return toast('賲乇丨賾賱 睾賷乇 氐丕賱丨');
+      const c={v:1,announce:an.value.trim(),relays:rs,ice:parseIce(ic.value),banned:bad,channels:L(fc).map(l=>{const[id,...n]=l.split('|');return{id:id.trim(),name:n.join('|').trim()||'賯賳丕丞'}}).filter(x=>/^[0-9a-f]{64}$/.test(x.id))};
+      const ev=NT.finalizeEvent({kind:30078,created_at:now(),tags:[['d','words-config']],content:JSON.stringify(c)},key);
+      if(await publish(ev)){cfg={...c,t:ev.created_at};store.set('cfg',cfg);startSub();toast('賳購卮乇鬲 廿毓丿丕丿丕鬲 丕賱賲賳氐丞 賱賱卮亘賰丞')}else toast('鬲毓匕賾乇 丕賱賳卮乇 毓賱賶 丕賱賲乇丨賾賱丕鬲')}},'馃摗 賳卮乇 廿毓丿丕丿丕鬲 丕賱賲賳氐丞 賱賱卮亘賰丞'),
+    el('div',{class:'t',style:'margin-top:8px'},'禺賵丕丿賲 賲賰丕賱賲丕鬲 賲丨賱賷丞'),lic,el('button',{class:'btn sec',onclick:()=>{opt.ice=parseIce(lic.value);store.set('opt',opt);toast('丨購賮馗鬲')}},'丨賮馗 丕賱禺賵丕丿賲 丕賱賲丨賱賷丞'),
+    el('button',{class:'btn sec',onclick:e=>addDiscovered(e.target)},'馃攷 丕賰鬲卮丕賮 兀爻乇毓 丕賱賲乇丨賾賱丕鬲 丕賱毓丕賲丞'),el('hr',{style:'border:0;border-top:1px solid var(--line);margin:6px 0'}));
+}
+// ---------- video call (WebRTC, signaling over encrypted Nostr events) ----------
+let pc=null,stream=null,callPeer=null,pend=[],sigQ=Promise.resolve();
+async function sig(to,o){const k=keyFor(to);if(canWrap){publish(wrap(mkRumor(k.sk,25050,[['p',to]],JSON.stringify(o)),k.sk,to));return}publish(NT.finalizeEvent({kind:25050,created_at:now(),tags:[['p',to]],content:await NT.nip04.encrypt(k.sk,to,JSON.stringify(o))},k.sk))}
+async function setupCall(p){
+  stream=await navigator.mediaDevices.getUserMedia({video:true,audio:true});callPeer=p;
+  pc=new RTCPeerConnection({iceServers:iceList()});
+  stream.getTracks().forEach(t=>pc.addTrack(t,stream));
+  pc.ontrack=e=>$('#rv').srcObject=e.streams[0];
+  pc.onicecandidate=e=>e.candidate&&sig(p,{t:'ice',c:e.candidate});
+  pc.onconnectionstatechange=()=>{if(['failed','closed'].includes(pc?.connectionState))endCall(false)};
+  $('#lv').srcObject=stream;$('#call').style.display='flex';
+}
+async function startCall(p){try{await setupCall(p);const o=await pc.createOffer();await pc.setLocalDescription(o);sig(p,{t:'offer',sdp:o});toast('噩丕乇賺 丕賱丕鬲氐丕賱鈥�');setTimeout(()=>{if(pc&&callPeer===p&&pc.connectionState!=='connected'){toast('賱丕 賷賵噩丿 乇丿');endCall()}},45000)}catch(e){toast('鬲毓匕賾乇 丕賱賵氐賵賱 賱賱賰丕賲賷乇丕/丕賱賲賷賰乇賵賮賵賳');endCall(false)}}
+function endCall(notify=true){if(notify&&callPeer)sig(callPeer,{t:'bye'});stream?.getTracks().forEach(t=>t.stop());try{pc?.close()}catch(e){}pc=stream=null;callPeer=null;pend=[];$('#call').style.display='none'}
+function onSignal(r,text){sigQ=sigQ.then(async()=>{
+  let o;try{o=JSON.parse(text)}catch(e){return}const p=r.other;if(r.mine)return;
+  if(o.t==='offer'){
+    if(pc)return sig(p,{t:'bye'});
+    if(!confirm(`賲賰丕賱賲丞 賮賷丿賷賵 賵丕乇丿丞 賲賳 ${nameOf(p)}. 賴賱 鬲賯亘賱責`))return sig(p,{t:'bye'});
+    try{await setupCall(p);await pc.setRemoteDescription(o.sdp);for(const c of pend)await pc.addIceCandidate(c).catch(()=>{});pend=[];const a=await pc.createAnswer();await pc.setLocalDescription(a);sig(p,{t:'answer',sdp:a})}catch(e){toast('賮卮賱 賯亘賵賱 丕賱賲賰丕賱賲丞');endCall()}
+  }else if(o.t==='answer'&&pc&&callPeer===p){await pc.setRemoteDescription(o.sdp).catch(()=>{})}
+  else if(o.t==='ice'){if(pc&&pc.remoteDescription)await pc.addIceCandidate(o.c).catch(()=>{});else pend.push(o.c)}
+  else if(o.t==='bye'&&callPeer===p){toast('丕賳鬲賴鬲 丕賱賲賰丕賱賲丞');endCall(false)}
+})}
+$('#cend').onclick=()=>endCall();
+$('#cmute').onclick=()=>stream?.getAudioTracks().forEach(t=>t.enabled=!t.enabled);
+$('#ccam').onclick=()=>stream?.getVideoTracks().forEach(t=>t.enabled=!t.enabled);
 
-    function hideAllInstallButtons() {
-        document.querySelectorAll('.installBtnDynamic').forEach(el => el.style.display = 'none');
-        const mainInstall = document.getElementById('installBtn');
-        if(mainInstall) mainInstall.style.display = 'none';
-    }
-
-    function nextScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
-
-    function showCustomAlert(title, message) {
-        document.getElementById('modalTitle').innerText = title;
-        document.getElementById('modalBody').innerText = message;
-        document.getElementById('customModal').style.display = 'flex';
-    }
-
-    function closeCustomModal() {
-        document.getElementById('customModal').style.display = 'none';
-    }
-
-    function showNotificationModal() {
-        document.getElementById('notificationModal').style.display = 'flex';
-    }
-
-    function closeNotificationModal() {
-        document.getElementById('notificationModal').style.display = 'none';
-        nextScreen('screen-profile');
-    }
-
-    function saveProfileAndGoHome() {
-        const name = document.getElementById('profileName').value.trim() || "مستخدم مشفر";
-        document.getElementById('displayUserName').innerText = name;
-        nextScreen('screen-main');
-    }
-
-    function openChat(title) {
-        document.getElementById('chatTitle').innerText = title;
-        nextScreen('screen-chat');
-    }
-
-    function sendChatMessage() {
-        const input = document.getElementById('chatInput');
-        const chatBox = document.getElementById('chatBox');
-        if(!input.value.trim()) return;
-
-        const msg = document.createElement('div');
-        msg.className = 'msg-bubble sent';
-        msg.innerText = input.value;
-        chatBox.appendChild(msg);
-        
-        input.value = '';
-        chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function addContact() {
-        const input = document.getElementById('contactInput');
-        if(!input.value.trim()) return;
-        const list = document.getElementById('contactsList');
-        const card = document.createElement('div');
-        card.className = 'action-card';
-        card.innerHTML = `
-            <div class="action-icon">👤</div>
-            <div class="action-text" style="flex:1;">
-                <span class="action-title">${input.value}</span>
-                <span class="action-desc">مسار words مخصص</span>
-            </div>
-            <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
-        `;
-        list.appendChild(card);
-        input.value = '';
-    }
-
-    function blockContact(btn) {
-        btn.parentElement.remove();
-        showCustomAlert("حظر جهة اتصال", "تم حظر جهة الاتصال وإغلاق مسار words المشفر.");
-    }
-
-    function connectLink() {
-        const val = document.getElementById('linkInput').value.trim();
-        if(val) openChat('محادثة الرابط المباشر');
-    }
-
-    function addRelayServer() {
-        const input = document.getElementById('relayInput');
-        if(!input.value.trim()) return;
-        const list = document.getElementById('relaysList');
-        const card = document.createElement('div');
-        card.className = 'action-card';
-        card.style.cssText = "padding:10px 14px; margin:0;";
-        card.innerHTML = `
-            <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#dcfce7; color:#16a34a;">⚡</div>
-            <div class="action-text" style="flex:1;">
-                <span class="action-title" style="font-size:0.85rem;">${input.value}</span>
-                <span class="action-desc" style="color:#16a34a;">تم الاتصال بنجاح • نشط</span>
-            </div>
-        `;
-        list.appendChild(card);
-        input.value = '';
-        showCustomAlert("إدارة المرحلات", "تمت إضافة سيرفر الترحيل الجديد بنجاح وفحص كفاءة اتصاله.");
-    }
-
-    function openRimailCall() {
-        window.open('https://hassan2026go.github.io/Rimail/', '_blank');
-    }
-
-    function clearData() {
-        showCustomAlert("مسح البيانات", "تم مسح كافة البيانات والمفاتيح المشفرة من الجهاز بنجاح.");
-    }
+// ---------- views ----------
+function render(){
+  const v=$('#view'),nav=$('#nav');v.replaceChildren();nav.replaceChildren();v.style.padding='';
+  if(locked){$('#nav').style.display='none';return renderUnlock(v)}if(!sk)return renderWelcome(v);
+  if(viewProf){nav.style.display='none';return renderProfView(v)}if(openKey){nav.style.display='none';return renderChat(v)}
+  nav.style.display='flex';
+  const T=[['chats','丕賱賲丨丕丿孬丕鬲'],['new','噩丿賷丿'],['me','丨爻丕亘賷']];if(adminOn)T.push(['admin','鈿� 丕賱廿丿丕乇丞']);
+  T.forEach(([k,l])=>nav.append(el('button',{class:tab===k?'on':'',onclick:()=>{tab=k;sub2=null;render()}},l)));
+  ({chats:renderChats,new:renderNew,me:renderMe,admin:renderAdmin}[tab]||renderChats)(v);
+}
+function renderWelcome(v){
+  $('#nav').style.display='none';
+  const imp=el('input',{placeholder:'nsec1鈥� (丕禺鬲賷丕乇賷: 丕爻鬲賷乇丕丿 丨爻丕亘)',dir:'ltr'});
+  v.append(el('h2',{},'賰購賳 丨購乇賾丕賸 賮賷 卮亘賰鬲賰'),el('p',{class:'s w'},'賱丕 丨爻丕亘 賵賱丕 乇賯賲 賴丕鬲賮. 賴賵賷鬲賰 賲賮鬲丕丨 賷購賵賱賻賾丿 毓賱賶 噩賴丕夭賰貙 賵丕賱乇爻丕卅賱 鬲賲乇賾 毓亘乇 賲乇丨賾賱丕鬲 Nostr 丕賱賲賮鬲賵丨丞.'),
+    el('button',{class:'btn',onclick:()=>{saveKey(NT.generateSecretKey());startSub();render()}},'兀賳卮卅 賴賵賷鬲賷'),
+    el('div',{class:'card'},imp,el('button',{class:'btn sec',style:'margin-top:8px;width:100%',onclick:()=>{try{const d=NT.nip19.decode(imp.value.trim());if(d.type!=='nsec')throw 0;saveKey(d.data);startSub();render()}catch(e){toast('賲賮鬲丕丨 睾賷乇 氐丕賱丨')}}},'丕爻鬲賷乇丕丿')));
+}
+function renderChats(v){
+  const keys=[...Object.keys(contacts).filter(p=>!isB(p)),...Object.keys(groups).map(g=>'g:'+g),...Object.keys(chans).map(c=>'c:'+c)];
+  v.append(el('h2',{},'丕賱賲丨丕丿孬丕鬲'),cfg.announce?el('div',{class:'card s w'},'馃摚 '+cfg.announce):'');
+  if(!keys.length)v.append(el('div',{class:'card s w'},'賱丕 賲丨丕丿孬丕鬲 亘毓丿. 賲賳 鬲亘賵賷亘 芦噩丿賷丿禄 兀賳卮卅 乇丕亘胤丕賸 兀賵 賲噩賲賵毓丞 兀賵 賯賳丕丞貙 兀賵 丕賱氐賯 乇丕亘胤 氐丿賷賯.'));
+  const lt=k=>(msgs[k]||[]).slice(-1)[0];keys.sort((a,b)=>(lt(b)?.t||0)-(lt(a)?.t||0));
+  keys.forEach(k=>{const n=nameOf(k),l=lt(k),ic=k.startsWith('g:')?'馃懃':k.startsWith('c:')?'馃摙':[...n][0]||'?';
+    v.append(el('div',{class:'card row',onclick:()=>{openKey=k;render()}},avEl(k),el('div',{class:'grow'},el('div',{class:'t'},n),el('div',{class:'s'},l?l.text:'丕亘丿兀 丕賱賲丨丕丿孬丞')),unread[k]?el('span',{class:'btn sm',style:'padding:2px 9px'},unread[k]):''))});
+}
+function act(ic,t,d,fn){return el('div',{class:'card row',onclick:fn},el('div',{class:'av'},ic),el('div',{class:'grow'},el('div',{class:'t'},t),el('div',{class:'s'},d)))}
+function renderNew(v){
+  const back=()=>el('button',{class:'btn sec sm',style:'align-self:flex-start',onclick:()=>{sub2=null;render()}},'鉃� 乇噩賵毓');
+  if(!sub2){
+    const q=el('input',{placeholder:'丕賱氐賯 乇丕亘胤 words 兀賵 npub 兀賵 乇丕亘胤 賯賳丕丞鈥�',dir:'ltr'});
+    return v.append(el('h2',{},'鬲丨丿賾孬 賲毓 卮禺氐 賲丕'),
+      act('馃敆','兀賳卮卅 乇丕亘胤丕賸 禺丕氐丕賸','乇丕亘胤 賱卮禺氐 賵丕丨丿貙 賷賲賰賳賰 廿賱睾丕丐賴',()=>{sub2='priv';render()}),
+      act('馃寪','乇丕亘胤賰 丕賱毓丕賲','賱賷鬲賲賰賳 兀賷 卮禺氐 賲賳 賲乇丕爻賱鬲賰',()=>{sub2='pub';render()}),
+      act('馃懃','兀賳卮卅 賲噩賲賵毓丞','賲丨丕丿孬丞 噩賲丕毓賷丞 賲卮賮賾乇丞',()=>{sub2='grp';render()}),
+      act('馃摙','兀賳卮卅 賯賳丕丞','亘孬 乇爻丕卅賱 賱毓丿丿 睾賷乇 賲丨丿賵丿',()=>{sub2='chan';render()}),act('猸�','賯賳賵丕鬲 丕賱賲賳氐丞','賯賳賵丕鬲 賲賯鬲乇丨丞 賲賳 廿丿丕乇丞 丕賱賲賳氐丞',()=>{sub2='dir';render()}),
+      el('div',{class:'flex'},q,el('button',{class:'btn',onclick:()=>q.value.trim()&&connect(q.value)},'乇亘胤')));
+  }
+  v.append(back());
+  if(sub2==='dir'){v.append(el('h2',{},'賯賳賵丕鬲 丕賱賲賳氐丞'));const D=cfg.channels||[];if(!D.length)v.append(el('div',{class:'card s w'},'賱丕 鬲賵噩丿 賯賳賵丕鬲 賲賯鬲乇丨丞 丨丕賱賷丕賸.'));D.forEach(c=>v.append(act('馃摙',c.name,'丕囟睾胤 賱賱丕賳囟賲丕賲',()=>connect('c-'+c.id))))}
+  if(sub2==='pub'){const l=base()+'#'+NT.nip19.npubEncode(pk);v.append(el('h2',{},'乇丕亘胤賰 丕賱毓丕賲'),el('div',{class:'card mono'},l),qrBox(l),el('div',{class:'flex'},el('button',{class:'btn grow',onclick:()=>share(l)},'賲卮丕乇賰丞'),el('button',{class:'btn sec grow',onclick:()=>copy(l)},'賳爻禺')),el('p',{class:'s w'},'兀賷 卮禺氐 賱丿賷賴 丕賱乇丕亘胤 賷爻鬲胤賷毓 賲乇丕爻賱鬲賰. 廿賳 丕賳鬲卮乇 賵兀夭毓噩賰 丕爻鬲禺丿賲 丕賱乇賵丕亘胤 丕賱禺丕氐丞 丕賱鬲賷 賷賲賰賳 廿賱睾丕丐賴丕.'))}
+  if(sub2==='priv'){
+    const lb=el('input',{placeholder:'賱賲賳 賴匕丕 丕賱乇丕亘胤責 (賲賱丕丨馗丞 賱賰 賮賯胤)'}),list=el('div',{style:'display:flex;flex-direction:column;gap:8px'});
+    const draw=()=>{list.replaceChildren();aliases.forEach((a,i)=>{const l=base()+'#'+NT.nip19.npubEncode(a.pk);list.append(el('div',{class:'card'},el('div',{class:'t'},a.label||'乇丕亘胤 禺丕氐'),el('div',{class:'mono s'},l),el('div',{class:'flex',style:'margin-top:6px'},el('button',{class:'btn sm',onclick:()=>share(l)},'賲卮丕乇賰丞'),el('button',{class:'btn sec sm',onclick:()=>copy(l)},'賳爻禺'),el('button',{class:'btn bad sm',onclick:()=>{if(confirm('廿賱睾丕亍 丕賱乇丕亘胤責 賱賳 鬲氐賱賰 乇爻丕卅賱 噩丿賷丿丞 毓亘乇賴.')){aliases.splice(i,1);sv();startSub();draw()}}},'廿賱睾丕亍'))))})};
+    v.append(el('h2',{},'乇賵丕亘胤 禺丕氐丞'),el('p',{class:'s w'},'賰賱 乇丕亘胤 賷丨賲賱 賴賵賷丞 賲爻鬲賯賱丞貨 賲賳 賷爻鬲禺丿賲賴 賱丕 賷乇賶 賲毓乇賾賮賰 丕賱乇卅賷爻賷貙 賵鬲爻鬲胤賷毓 廿賱睾丕亍賴 賲鬲賶 卮卅鬲.'),lb,el('button',{class:'btn',onclick:()=>{const s=NT.generateSecretKey();aliases.push({sk:b2h(s),pk:NT.getPublicKey(s),label:lb.value.trim()});sv();startSub();lb.value='';draw()}},'廿賳卮丕亍 乇丕亘胤 噩丿賷丿'),list);draw();
+  }
+  if(sub2==='grp'){
+    const n=el('input',{placeholder:'丕爻賲 丕賱賲噩賲賵毓丞'}),m=el('textarea',{placeholder:'賲毓乇賾賮丕鬲 丕賱兀毓囟丕亍 (npub)貙 賵丕丨丿 賮賷 賰賱 爻胤乇',dir:'ltr'});
+    v.append(el('h2',{},'賲噩賲賵毓丞 噩丿賷丿丞'),n,m,el('button',{class:'btn',onclick:async()=>{
+      const mem=[...new Set(m.value.split(/[\s,]+/).filter(Boolean).map(parseId))];if(!n.value.trim())return toast('丕賰鬲亘 丕爻賲丕賸');if(mem.includes(null)||!mem.length)return toast('鬲丨賯賯 賲賳 丕賱賲毓乇賾賮丕鬲');
+      const gid=rnd(8);groups[gid]={name:n.value.trim(),members:[pk,...mem.filter(x=>x!==pk)]};sv();openKey='g:'+gid;render();send(openKey,'馃憢 鬲賲 廿賳卮丕亍 丕賱賲噩賲賵毓丞')}},'廿賳卮丕亍'),
+      el('p',{class:'s w'},'鬲購乇爻賱 賰賱 乇爻丕賱丞 賲卮賮賾乇丞 賱賰賱 毓囟賵 毓賱賶 丨丿丞貙 賵賯丕卅賲丞 丕賱兀毓囟丕亍 鬲馗賴乇 賮賷 賵爻賵賲 丕賱丨丿孬 賱賱賲乇丨賾賱丕鬲.'));
+  }
+  if(sub2==='chan'){
+    const n=el('input',{placeholder:'丕爻賲 丕賱賯賳丕丞'}),b=el('input',{type:'checkbox',checked:'',style:'width:auto'});
+    v.append(el('h2',{},'賯賳丕丞 毓丕賲丞'),n,el('label',{class:'flex s w'},b,'亘孬 賮賯胤: 兀賳丕 賵丨丿賷 兀賳卮乇 賵丕賱丌禺乇賵賳 賷賯乇丐賵賳'),el('button',{class:'btn',onclick:async()=>{
+      if(!n.value.trim())return toast('丕賰鬲亘 丕爻賲丕賸');const ev=NT.finalizeEvent({kind:40,created_at:now(),tags:[],content:JSON.stringify({name:n.value.trim(),about:'words channel',broadcast:b.checked})},sk);
+      if(!await publish(ev))return toast('鬲毓匕賾乇 丕賱賳卮乇 毓賱賶 丕賱賲乇丨賾賱丕鬲');chans[ev.id]={name:n.value.trim(),owner:pk,broadcast:b.checked};sv();startSub();
+      const l=base()+'#c-'+ev.id;openKey='c:'+ev.id;render();toast('兀購賳卮卅鬲 丕賱賯賳丕丞. 卮丕乇賰 乇丕亘胤賴丕 賲賳 丿丕禺賱賴丕')}},'廿賳卮丕亍'),el('p',{class:'s w'},'乇爻丕卅賱 丕賱賯賳賵丕鬲 毓賱賳賷丞 賵睾賷乇 賲卮賮賾乇丞.'));
+  }
+}
+function renderMe(v){
+  const nm=el('input',{placeholder:'丕爻賲賰',value:me.name||''}),npub=NT.nip19.npubEncode(pk),th=store.get('theme','auto');
+  v.append(el('h2',{},'丨爻丕亘賷'),el('div',{class:'card'},el('div',{class:'t'},'賲毓乇賾賮賰 丕賱毓丕賲'),el('div',{class:'mono'},npub),el('div',{class:'flex',style:'margin-top:8px'},el('button',{class:'btn sec grow',onclick:()=>copy(npub)},'賳爻禺'),el('button',{class:'btn sec grow',onclick:()=>share(base()+'#'+npub)},'賲卮丕乇賰丞 乇丕亘胤'))),
+    profileCard(),
+    el('div',{class:'card'},el('div',{class:'t'},'丕賱賲馗賴乇 賵丕賱廿卮毓丕乇丕鬲'),el('div',{class:'flex',style:'margin-top:8px;flex-wrap:wrap'},...[['auto','鬲賱賯丕卅賷'],['light','賮丕鬲丨'],['dark','丿丕賰賳']].map(([k,l])=>el('button',{class:'btn sm '+(th===k?'':'sec'),onclick:()=>{store.set('theme',k);applyTheme();render()}},l)),el('button',{class:'btn sec sm',onclick:()=>window.Notification?Notification.requestPermission().then(r=>toast(r==='granted'?'賮購毓賾賱鬲 丕賱廿卮毓丕乇丕鬲':'賱賲 賷購爻賲丨 亘丕賱廿卮毓丕乇丕鬲')):toast('睾賷乇 賲丿毓賵賲')},'馃敂 鬲賮毓賷賱 丕賱廿卮毓丕乇丕鬲'))),
+    lockCard(),el('div',{class:'card',style:'display:flex;flex-direction:column;gap:8px'},el('div',{class:'t'},'丕賱卮亘賰丞 賵丕賱賲賳氐丞'),el('label',{class:'flex s w'},chk(opt.plat!==false,x=>{opt.plat=x}),'丕爻鬲禺丿丕賲 賲乇丨賾賱丕鬲 賵禺賵丕丿賲 賲賰丕賱賲丕鬲 丕賱賲賳氐丞'),el('label',{class:'flex s w'},chk(opt.ban!==false,x=>{opt.ban=x}),'鬲胤亘賷賯 賯丕卅賲丞 丕賱丨馗乇 丕賱毓丕賲丞 賱賱賲賳氐丞'),el('button',{class:'btn sec sm',onclick:e=>addDiscovered(e.target)},'馃攷 丕賰鬲卮丕賮 兀爻乇毓 丕賱賲乇丨賾賱丕鬲 丕賱毓丕賲丞'),el('button',{class:'btn sec sm',onclick:()=>syncCfg(true)},'鈫� 鬲丨丿賷孬 廿毓丿丕丿丕鬲 丕賱賲賳氐丞')),el('div',{class:'card',style:'display:flex;flex-direction:column;gap:8px'},el('div',{class:'t'},'賳爻禺丞 丕丨鬲賷丕胤賷丞 賰丕賲賱丞'),el('p',{class:'s w'},'鬲卮賲賱 丕賱賲賮鬲丕丨 丕賱爻乇賷 賵噩賴丕鬲 丕賱丕鬲氐丕賱 賵丕賱賲噩賲賵毓丕鬲 賵丕賱賯賳賵丕鬲 賵丕賱廿毓丿丕丿丕鬲.'),el('button',{class:'btn sec sm',onclick:()=>confirm('丕賱賳爻禺丞 鬲丨賵賷 賲賮鬲丕丨賰 丕賱爻乇賷. 丕丨鬲賮馗 亘賴丕 賮賷 賲賰丕賳 丌賲賳.')&&copy(bk(),'賳購爻禺鬲 丕賱賳爻禺丞 丕賱丕丨鬲賷丕胤賷丞')},'賳爻禺 賳爻禺丞 賰丕賲賱丞'),el('button',{class:'btn sec sm',onclick:()=>{const t=prompt('丕賱氐賯 丕賱賳爻禺丞 丕賱丕丨鬲賷丕胤賷丞');t&&restore(t)}},'丕爻鬲毓丕丿丞 賲賳 賳爻禺丞')),el('div',{class:'card'},el('div',{class:'t'},'丕賱賳爻禺 丕賱丕丨鬲賷丕胤賷'),el('p',{class:'s w',style:'margin:4px 0 8px'},'丕賱賲賮鬲丕丨 丕賱爻乇賷 賴賵 丨爻丕亘賰 丕賱賵丨賷丿. 賱丕 賷賲賰賳 丕爻鬲毓丕丿鬲賴 廿賳 賮購賯丿.'),el('button',{class:'btn sec',onclick:()=>{if(confirm('爻賷購賳爻禺 賲賮鬲丕丨賰 丕賱爻乇賷. 鬲兀賰丿 兀賳 賱丕 兀丨丿 賷乇丕賯亘 卮丕卮鬲賰.'))copy(NT.nip19.nsecEncode(sk),'賳購爻禺 丕賱賲賮鬲丕丨 丕賱爻乇賷')}},'賳爻禺 丕賱賲賮鬲丕丨 丕賱爻乇賷 (nsec)')),
+    el('button',{class:'btn bad',onclick:wipe},'鬲爻噩賷賱 丕賱禺乇賵噩 賵賲爻丨 丕賱亘賷丕賳丕鬲'));
+}
+function wipe(){if(confirm('爻賷購丨匕賮 丕賱賲賮鬲丕丨 丕賱爻乇賷 賵賰賱 丕賱亘賷丕賳丕鬲 賲賳 賴匕丕 丕賱噩賴丕夭 賳賴丕卅賷丕賸. 賴賱 賳爻禺鬲 nsec責')){try{localStorage.clear()}catch(e){}location.reload()}}
+function applyTheme(){const t=store.get('theme','auto');if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t)}
+function drawMsgs(){
+  const box=$('#msgs');if(!box)return;box.replaceChildren();const grp=openKey.startsWith('g:')||openKey.startsWith('c:');
+  (msgs[openKey]||[]).forEach(m=>box.append(el('div',{class:'b '+(m.mine?'me':'th')},m.text,el('small',{},(grp&&!m.mine?nameOf(m.from)+' 鈥� ':'')+new Date(m.t*1000).toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})))));
+  box.scrollTop=box.scrollHeight;
+}
+function renderChat(v){
+  unread[openKey]=0;store.set('unread',unread);const k=openKey,isC=k.startsWith('c:'),isG=k.startsWith('g:'),C=chans[k.slice(2)],canPost=!(isC&&C?.broadcast&&C.owner!==pk);
+  v.style.padding='8px 16px calc(12px + env(safe-area-inset-bottom,0px))';if(!k.startsWith('g:')&&!isC&&!fetched.has(k)){fetched.add(k);fetchName(k)}
+  const inp=el('input',{placeholder:'丕賰鬲亘 乇爻丕賱丞鈥�'}),go=()=>{const t=inp.value.trim();if(t){inp.value='';send(k,t)}};inp.onkeydown=e=>{if(e.key==='Enter')go()};
+  const hd=el('div',{class:'flex'},el('button',{class:'btn sec sm',onclick:()=>{openKey=null;render()}},'鉃�'),avEl(k,34),el('div',{class:'grow t',style:'cursor:pointer',onclick:()=>{if(!isG&&!isC){viewProf=k;render()}}},nameOf(k)));
+  if(!isG&&!isC)hd.append(el('button',{class:'btn sec sm',onclick:()=>startCall(k)},'馃摴'),el('button',{class:'btn sec sm',onclick:()=>{const n=prompt('丕爻賲 噩賴丞 丕賱丕鬲氐丕賱',contacts[k]?.name||'');if(n!==null){(contacts[k]||={}).name=n.trim();sv();render()}}},'鉁忥笍'),el('button',{class:'btn sec sm',onclick:()=>{if(confirm('丨馗乇 賴匕賴 丕賱噩賴丞責')){blocked.push(k);store.set('blocked',blocked);openKey=null;render()}}},'丨馗乇'));
+  if(isC)hd.append(el('button',{class:'btn sec sm',onclick:()=>share(base()+'#c-'+k.slice(2))},'馃敆'),el('button',{class:'btn sec sm',onclick:()=>{if(confirm('賲睾丕丿乇丞 丕賱賯賳丕丞責')){delete chans[k.slice(2)];sv();startSub();openKey=null;render()}}},'賲睾丕丿乇丞'));
+  if(isG)hd.append(el('button',{class:'btn sec sm',onclick:()=>alert(groups[k.slice(2)].members.map(nameOf).join('\n'))},'馃懃'),el('button',{class:'btn sec sm',onclick:()=>{if(confirm('丨匕賮 丕賱賲噩賲賵毓丞 賲賳 噩賴丕夭賰責')){delete groups[k.slice(2)];sv();openKey=null;render()}}},'丨匕賮'));
+  v.append(hd,el('div',{class:'msgs',id:'msgs'}),canPost?el('div',{class:'flex'},inp,el('button',{class:'btn',onclick:go},'廿乇爻丕賱')):el('div',{class:'card s w'},'賯賳丕丞 亘孬: 丕賱賳丕卮乇 賮賯胤 賷賰鬲亘 賮賷賴丕.'));
+  drawMsgs();
+}
+function renderAdmin(v){renderAdminPlat(v);renderAdminLocal(v)}
+function renderAdminLocal(v){
+  v.append(el('h2',{},'賱賵丨丞 丕賱廿丿丕乇丞'),el('p',{class:'s w'},'賱丕 賷賵噩丿 禺丕丿賲 賲乇賰夭賷貙 賱匕丕 廿毓丿丕丿丕鬲 丕賱廿丿丕乇丞 鬲購胤亘賻賾賯 毓賱賶 賴匕丕 丕賱噩賴丕夭 賮賯胤.'));
+  const rin=el('input',{placeholder:'wss://relay.example.com',dir:'ltr'}),rl=el('div',{style:'display:flex;flex-direction:column;gap:8px'});
+  const draw=()=>{rl.replaceChildren();relays.forEach(u=>{const d=el('span',{class:'dot'}),lat=el('span',{class:'s'},'鈥�');
+    rl.append(el('div',{class:'card row'},d,el('div',{class:'grow mono'},u),lat,el('button',{class:'btn sec sm',onclick:async()=>{lat.textContent='鈥�';const ms=await testRelay(u);d.className='dot '+(ms===null?'bad':'ok');lat.textContent=ms===null?'賮卮賱':ms+'ms'}},'賮丨氐'),el('button',{class:'btn bad sm',onclick:()=>{relays=relays.filter(x=>x!==u);store.set('relays',relays);startSub();draw()}},'鉁�')))})};draw();
+  v.append(el('div',{class:'t'},'丕賱賲乇丨賾賱丕鬲 (Relays)'),el('div',{class:'flex'},rin,el('button',{class:'btn',onclick:()=>{const u=rin.value.trim();if(!/^wss?:\/\/.+/.test(u))return toast('丕賱乇丕亘胤 賷亘丿兀 亘賭 wss://');if(relays.includes(u))return toast('賲賵噩賵丿 賲爻亘賯丕賸');relays.push(u);store.set('relays',relays);rin.value='';startSub();draw()}},'廿囟丕賮丞')),rl,
+    el('button',{class:'btn sec',onclick:async()=>{const r=await Promise.all(relays.map(async u=>[u,await testRelay(u)])),ok=r.filter(x=>x[1]!==null).sort((a,b)=>a[1]-b[1]).map(x=>x[0]);if(!ok.length)return toast('賱丕 賲乇丨賾賱 賲鬲丕丨');relays=ok;store.set('relays',relays);startSub();draw();toast('乇購鬲賾亘鬲 丕賱兀爻乇毓 兀賵賱丕賸 賵兀購夭賷賱鬲 丕賱賲毓胤賱丞')}},'賮丨氐 丕賱賰賱 賵鬲乇鬲賷亘 丕賱兀爻乇毓'),
+    el('button',{class:'btn sec',onclick:()=>{relays=[...DEFAULT_RELAYS];store.set('relays',relays);startSub();draw()}},'丕爻鬲毓丕丿丞 丕賱丕賮鬲乇丕囟賷丞'));
+  const bin=el('input',{placeholder:'npub 賱丨馗乇賴',dir:'ltr'}),bl=el('div',{style:'display:flex;flex-direction:column;gap:6px'});
+  const dB=()=>{bl.replaceChildren();blocked.forEach(p=>bl.append(el('div',{class:'card row'},el('div',{class:'grow mono'},NT.nip19.npubEncode(p)),el('button',{class:'btn sec sm',onclick:()=>{blocked=blocked.filter(x=>x!==p);store.set('blocked',blocked);dB()}},'賮賰'))))};dB();
+  v.append(el('div',{class:'t',style:'margin-top:8px'},'丕賱賲爻鬲禺丿賲賵賳 丕賱賲丨馗賵乇賵賳'),el('div',{class:'flex'},bin,el('button',{class:'btn',onclick:()=>{const p=parseId(bin.value);if(!p)return toast('賲毓乇賾賮 睾賷乇 氐丕賱丨');if(!blocked.includes(p))blocked.push(p);store.set('blocked',blocked);bin.value='';dB()}},'丨馗乇')),bl,
+    el('div',{class:'card s w'},`丕賱賲乇丨賾賱丕鬲 ${relays.length} 鈥� 噩賴丕鬲 丕賱丕鬲氐丕賱 ${Object.keys(contacts).length} 鈥� 丕賱賲噩賲賵毓丕鬲 ${Object.keys(groups).length} 鈥� 丕賱賯賳賵丕鬲 ${Object.keys(chans).length} 鈥� 丕賱乇賵丕亘胤 丕賱禺丕氐丞 ${aliases.length} 鈥� 丕賱賲丨馗賵乇賵賳 ${blocked.length}`),
+    el('button',{class:'btn sec',onclick:()=>{adminOn=false;tab='chats';render()}},'廿禺賮丕亍 賱賵丨丞 丕賱廿丿丕乇丞'),el('button',{class:'btn bad',onclick:wipe},'賲爻丨 賰賱 丕賱亘賷丕賳丕鬲 賵丕賱賲賮丕鬲賷丨'));
+}
+let taps=0,tapT;$('#brand').onclick=()=>{taps++;clearTimeout(tapT);tapT=setTimeout(()=>taps=0,3000);if(taps>=10){taps=0;adminOn=true;tab='admin';openKey=null;render();toast('賮購鬲丨鬲 賱賵丨丞 丕賱廿丿丕乇丞')}};
+let dp;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();dp=e;$('#inst').style.display='block'});
+$('#inst').onclick=()=>{if(dp){dp.prompt();dp=null;$('#inst').style.display='none'}};
+window.addEventListener('appinstalled',()=>$('#inst').style.display='none');
+window.addEventListener('hashchange',()=>{if(sk&&location.hash.length>1)connect(location.hash.slice(1))});
+applyTheme();if(loadKey())startSub();syncCfg();setInterval(syncCfg,600000);setInterval(()=>{try{const m=pool.listConnectionStatus();$('#rs').textContent=[...m.values()].filter(Boolean).length+'/'+m.size+' 鈼�'}catch(e){}},4000);render();if(sk&&location.hash.length>1)connect(location.hash.slice(1));
 </script>
-
 </body>
 </html>
