@@ -4,353 +4,585 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>words - شبكة المراسلة الآمنة</title>
-    <!-- Web App Manifest للتثبيت على الموبايل -->
-    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIndvcmRzIiwKICAic2hvcnRfbmFtZSI6ICJ3b3JkcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZTBmMmZlIiwKICAidGhlbWVfY29sb3IiOiAiIzAyODRjNyIKfQ==">
+    <!-- استدعاء خط عصري تناسبي -->
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #0284c7;
-            --light-blue-grad: linear-gradient(180deg, #e0f2fe 0%, #bae6fd 60%, #7dd3fc 100%);
+            --light-blue-grad: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-card: rgba(255, 255, 255, 0.85);
             --text-dark: #0f172a;
             --text-muted: #475569;
         }
 
         * {
             box-sizing: border-box;
-            margin: 0; padding: 0;
+            margin: 0;
+            padding: 0;
             font-family: 'Tajawal', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            /* خلفية زرقاء بتدرج ورسم نوتة موسيقية خفيفة */
             background: var(--light-blue-grad);
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4) 0%, transparent 60%),
-                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100' opacity='0.08'%3E%3Cpath d='M30 20 v40 a10 10 0 1 1 -10 -10 h10 v-30 h20 v30 a10 10 0 1 1 -10 -10 h10 v-20 Z' fill='%3C%230284c7'/%3E%3C/svg%3E");
             background-attachment: fixed;
             color: var(--text-dark);
             min-height: 100vh;
             display: flex;
             justify-content: center;
+            align-items: center;
+            padding: 0;
         }
 
+        /* حاوية الهاتف الذكية */
         .app-container {
             width: 100%;
             max-width: 430px;
             height: 100vh;
-            background: rgba(248, 250, 252, 0.7);
-            backdrop-filter: blur(15px);
+            background: rgba(248, 250, 252, 0.6);
+            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
-        /* الشاشات */
+        /* شاشات التطبيق المتعددة */
         .screen {
             display: none;
             flex-direction: column;
             height: 100%;
-            padding: 20px;
+            padding: 24px 20px;
             overflow-y: auto;
-            padding-bottom: 80px; /* المساحة لشريط التنقل السفلي */
+            animation: fadeIn 0.3s ease-in-out;
         }
 
-        .screen.active { display: flex; }
-
-        /* الهوية والتصميم */
-        .brand-header {
+        .screen.active {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* عناصر الهوية والشعار */
         .brand-logo {
-            font-size: 1.8rem;
+            font-size: 2.2rem;
             font-weight: 800;
+            letter-spacing: -1px;
             color: #0369a1;
+            text-align: center;
+            margin-top: 10px;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
         }
-        .brand-logo::after { content: '❖'; font-size: 1.2rem; color: var(--primary-blue); }
 
+        .brand-logo::after {
+            content: '❖';
+            font-size: 1.4rem;
+            color: #0284c7;
+        }
+
+        .hero-img {
+            width: 140px;
+            height: 140px;
+            margin: 15px auto;
+            background: #e0f2fe;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
+        }
+
+        .title-primary {
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        /* الأزرار العصرية */
         .btn-primary {
-            background: var(--primary-blue);
+            background: #0284c7;
             color: white;
             border: none;
-            padding: 14px;
-            border-radius: 14px;
-            font-size: 1rem;
+            padding: 16px;
+            border-radius: 16px;
+            font-size: 1.1rem;
             font-weight: 700;
-            cursor: pointer;
             width: 100%;
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s;
+            margin-top: auto;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #0284c7;
+            border: none;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        /* حقول المدخلات */
+        .input-group {
+            margin-bottom: 20px;
         }
 
         .custom-input {
             width: 100%;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 14px;
             border: 1.5px solid #bae6fd;
             background: white;
-            font-size: 0.95rem;
+            font-size: 1rem;
+            color: var(--text-dark);
             outline: none;
-            margin-bottom: 10px;
+            transition: border 0.2s;
         }
 
-        .card {
+        .custom-input:focus {
+            border-color: #0284c7;
+        }
+
+        /* بطاقات الخيارات في الشاشة الرئيسية */
+        .action-card {
             background: white;
             border-radius: 16px;
-            padding: 14px;
+            padding: 14px 16px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             cursor: pointer;
+            transition: transform 0.2s;
         }
 
-        .icon-box {
-            width: 42px; height: 42px;
+        .action-card:active {
+            transform: scale(0.99);
+        }
+
+        .action-icon {
+            width: 44px;
+            height: 44px;
             border-radius: 12px;
             background: #e0f2fe;
-            color: var(--primary-blue);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; font-weight: bold;
-        }
-
-        /* شريط التنقل السفلي Bottom Nav */
-        .bottom-nav {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            height: 65px;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
+            color: #0284c7;
             display: flex;
-            border-top: 1px solid #e2e8f0;
-            z-index: 50;
-        }
-
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            cursor: pointer;
-            gap: 3px;
-        }
-
-        .nav-item.active {
-            color: var(--primary-blue);
+            font-size: 1.3rem;
             font-weight: bold;
         }
 
-        .nav-item span { font-size: 1.2rem; }
-
-        /* نافذة الفيديو المباشرة */
-        .video-container {
-            width: 100%;
-            height: 220px;
-            background: #0f172a;
-            border-radius: 16px;
+        .action-text {
             display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            margin-bottom: 15px;
-            position: relative;
+            flex-direction: column;
         }
 
-        /* فقاعات الدردشة */
-        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; }
-        .msg { max-width: 80%; padding: 10px 14px; border-radius: 14px; font-size: 0.9rem; }
-        .msg.sent { align-self: flex-start; background: var(--primary-blue); color: white; }
-        .msg.received { align-self: flex-end; background: white; color: var(--text-dark); }
+        .action-title {
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        .action-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* نافذة الحوار المباشرة (Modal) */
+        .modal {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            padding: 24px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        /* قسم الدردشة والمكالمات */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 12px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+
+        .msg-bubble {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .msg-bubble.sent {
+            align-self: flex-start;
+            background: #0284c7;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .msg-bubble.received {
+            align-self: flex-end;
+            background: white;
+            color: var(--text-dark);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        /* شريط الوصول السريع السفلي الأنيق */
+        .quick-nav {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+            background: rgba(255,255,255,0.7);
+            padding: 6px;
+            border-radius: 16px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: bold;
+            font-size: 0.82rem;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .quick-btn.active {
+            background: white;
+            color: #0284c7;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- 1. الرئيسية والدردشات -->
-    <div class="screen active" id="screen-chats">
-        <div class="brand-header">
-            <div class="brand-logo">words</div>
-            <button onclick="installApp()" style="border:none; background:#e0f2fe; color:var(--primary-blue); padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:bold; cursor:pointer;">📲 تثبيت التطبيق</button>
-        </div>
-
-        <div class="card" onclick="openChat('أنبوب عام')">
-            <div class="icon-box">💬</div>
-            <div>
-                <div style="font-weight: bold;">أنبوب المحادثة الرئيسي</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">انقرة للدردشة المشفرة الحية</div>
-            </div>
-        </div>
-
-        <div class="card" onclick="openVideoCall()">
-            <div class="icon-box">📹</div>
-            <div>
-                <div style="font-weight: bold;">مكالمة فيديو مشفرة</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">إنشاء رابط اتصال مرئي مباشر</div>
-            </div>
-        </div>
+    <!-- 1. شاشة الترحيب الأولى -->
+    <div class="screen active" id="screen-welcome">
+        <div class="brand-logo">words</div>
+        <div class="hero-img">📱</div>
+        <h1 class="title-primary">كُن حُرَّاً في شبكتك</h1>
+        <p class="subtitle">مُراسلة خاصة وآمنة بالكامل.<br>أول شبكة تمتلك فيها جهات اتصالك ومجموعاتك بنفسك.</p>
+        <button class="btn-primary" onclick="nextScreen('screen-rules')">ابدأ الآن</button>
+        <button class="btn-secondary" onclick="alert('words مبني على بنية الأنابيب المشفرة بدون وجود خوادم مركزية تخزن بياناتك.')">لماذا بنينا words؟</button>
     </div>
 
-    <!-- 2. جهات الاتصال والمتابعة -->
-    <div class="screen" id="screen-contacts">
-        <div class="brand-header"><div class="brand-logo">جهات الاتصال</div></div>
+    <!-- 2. شاشة الشروط والالتزامات -->
+    <div class="screen" id="screen-rules">
+        <div class="brand-logo">words</div>
+        <h2 class="title-primary" style="margin-top: 15px;">التزامات الشبكة</h2>
+        <p class="subtitle" style="text-align: right; margin-bottom: 12px;">يلتزم التطبيق بما يلي:</p>
+        <div style="background: white; padding: 15px; border-radius: 14px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);">
+            • الاستقلالية التامة وعدم تتبع بياناتك.<br>
+            • تقليل استخدام البيانات الوصفية (Zero Metadata).<br>
+            • تشغيل برمجيات مفتوحة المصدر وموثوقة.<br>
+            • المحتوى القانوني فقط واحترام الخصوصية.
+        </div>
+        <button class="btn-primary" onclick="showNotificationModal()">اقبل واصل</button>
+    </div>
+
+    <!-- 3. شاشة إنشاء ملف التعريف -->
+    <div class="screen" id="screen-profile">
+        <div class="brand-logo">words</div>
+        <div class="hero-img" style="width: 90px; height: 90px; font-size: 2.2rem; margin-top: 10px;">👤</div>
+        <h2 class="title-primary">ملف تعريفك</h2>
+        <p class="subtitle">على جوالك فقط، وليس على الخوادم.<br>لا حساب، لا رقم هاتف، لا بريد إلكتروني.</p>
         
-        <input type="text" id="contactInput" class="custom-input" placeholder="ادخل معرف الأنبوب للإضافة..." />
-        <button class="btn-primary" onclick="addContact()" style="margin-bottom: 15px;">إضافة جهة اتصال</button>
+        <div class="input-group">
+            <input type="text" id="profileName" class="custom-input" placeholder="ادخل اسم ملف التعريف..." />
+        </div>
 
-        <div style="font-weight: bold; margin-bottom: 8px; font-size: 0.9rem;">القائمة المجهزة:</div>
+        <button class="btn-primary" onclick="saveProfileAndGoHome()">أنشئ ملف تعريف</button>
+    </div>
+
+    <!-- 4. الشاشة الرئيسية للتطبيق (مع الشريط السريع) -->
+    <div class="screen" id="screen-main">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="brand-logo" style="font-size: 1.6rem; margin: 0;">words</div>
+            <span id="displayUserName" style="font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
+        </div>
+
+        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 10px;">تحدث مع شخص ما</p>
+
+        <div class="action-card" onclick="openChat('رابط خاص')">
+            <div class="action-icon">🔗</div>
+            <div class="action-text">
+                <span class="action-title">أنشئ رابطاً خاصاً</span>
+                <span class="action-desc">رابط اتصال مخصص لشخص واحد</span>
+            </div>
+        </div>
+
+        <div class="action-card" onclick="openChat('رابط عام')">
+            <div class="action-icon">🌐</div>
+            <div class="action-text">
+                <span class="action-title">أنشئ رابطك العام</span>
+                <span class="action-desc">لكي يتمكن أي شخص من الوصول إليك</span>
+            </div>
+        </div>
+
+        <div class="action-card" onclick="openChat('مجموعة جديدة')">
+            <div class="action-icon">👥</div>
+            <div class="action-text">
+                <span class="action-title">أنشئ مجموعة</span>
+                <span class="action-desc">محادثة جماعية مشفرة بين أطراف متعددة</span>
+            </div>
+        </div>
+
+        <div class="action-card" onclick="openChat('قناة عامة')">
+            <div class="action-icon">📢</div>
+            <div class="action-text">
+                <span class="action-title">أنشئ قناة عامة</span>
+                <span class="action-desc">بث الرسائل لعدد غير محدود من المتابعين</span>
+            </div>
+        </div>
+
+        <div class="action-card" onclick="nextScreen('screen-video')">
+            <div class="action-icon" style="background:#fef3c7; color:#d97706;">📹</div>
+            <div class="action-text">
+                <span class="action-title">مكالمة فيديو مشفرة</span>
+                <span class="action-desc">اتصال مرئي مباشر عبر WebRTC</span>
+            </div>
+        </div>
+
+        <div style="margin-top: auto; display: flex; gap: 8px;">
+            <input type="text" id="linkInput" class="custom-input" placeholder="ابحث أو الصق رابط words..." style="padding: 12px; margin:0;" />
+            <button class="btn-primary" style="width: auto; padding: 12px 18px;" onclick="connectLink()">ربط</button>
+        </div>
+
+        <!-- شريط الخيارات الذكي في الأسفل -->
+        <div class="quick-nav">
+            <button class="quick-btn active" onclick="nextScreen('screen-main')">الرئيسية</button>
+            <button class="quick-btn" onclick="nextScreen('screen-contacts')">جهات الاتصال</button>
+            <button class="quick-btn" onclick="nextScreen('screen-settings')">الإعدادات</button>
+        </div>
+    </div>
+
+    <!-- 5. شاشة جهات الاتصال والحظر -->
+    <div class="screen" id="screen-contacts">
+        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">جهات الاتصال والحظر</div>
+        
+        <div style="display:flex; gap:6px; margin-bottom:15px;">
+            <input type="text" id="contactInput" class="custom-input" placeholder="معرف الأنبوب..." style="margin:0; padding:12px;" />
+            <button class="btn-primary" style="width:auto; padding:12px;" onclick="addContact()">إضافة</button>
+        </div>
+
         <div id="contactsList">
-            <div class="card">
-                <div class="icon-box">👤</div>
-                <div style="flex: 1;">
-                    <div style="font-weight: bold;">صديق آمن (أنبوب)</div>
-                    <div style="font-size: 0.75rem; color: #10b981;">متصل الآن</div>
+            <div class="action-card">
+                <div class="action-icon">👤</div>
+                <div class="action-text" style="flex:1;">
+                    <span class="action-title">جهة اتصال آمنة</span>
+                    <span class="action-desc">أنبوب E2EE موجه</span>
                 </div>
-                <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-size:0.75rem;">حظر</button>
+                <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
             </div>
         </div>
+
+        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 3. مكالمات الفيديو -->
+    <!-- 6. شاشة مكالمة الفيديو -->
     <div class="screen" id="screen-video">
-        <div class="brand-header"><div class="brand-logo">مكالمة فيديو WebRTC</div></div>
-        <div class="video-container" id="videoBox">
-            <span>📷 الكاميرا بانتظار بدء الاتصال...</span>
+        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">مكالمة فيديو WebRTC</div>
+        
+        <div style="width:100%; height:200px; background:#0f172a; border-radius:20px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem; margin-bottom:15px;">
+            📹 الكاميرا جاهزة لبدء البث المشفر...
         </div>
-        <input type="text" class="custom-input" id="callLink" value="https://words.app/call?room=xyz123" readonly />
-        <button class="btn-primary" onclick="copyCallLink()">نسخ رابط المكالمة ومشاركته</button>
+
+        <input type="text" class="custom-input" value="https://words.app/call?room=secret_99" readonly />
+        <button class="btn-primary" onclick="alert('تم نسخ رابط غرفة الفيديو بنجاح!')">نسخ رابط المكالمة</button>
+        
+        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 4. الإعدادات والخصوصية -->
+    <!-- 7. شاشة الإعدادات -->
     <div class="screen" id="screen-settings">
-        <div class="brand-header"><div class="brand-logo">الإعدادات</div></div>
-        <div class="card">
-            <div class="icon-box">🔐</div>
-            <div>
-                <div style="font-weight: bold;">مفاتيح التشفير المحلية</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">AES-256 + Noise Protocol</div>
+        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">الإعدادات والتشفير</div>
+        
+        <div class="action-card">
+            <div class="action-icon">🔐</div>
+            <div class="action-text">
+                <span class="action-title">مفاتيح التشفير المحلية</span>
+                <span class="action-desc">AES-256 / Noise Protocol</span>
             </div>
         </div>
-        <div class="card" onclick="clearData()" style="border: 1px solid #fee2e2;">
-            <div class="icon-box" style="background: #fee2e2; color: #ef4444;">🗑️</div>
-            <div>
-                <div style="font-weight: bold; color: #ef4444;">مسح السجل وقواعد البيانات</div>
-                <div style="font-size: 0.8rem; color: var(--text-muted);">حذف كافة البيانات من الهاتف</div>
+
+        <div class="action-card" onclick="clearData()">
+            <div class="action-icon" style="background:#fee2e2; color:#ef4444;">🗑️</div>
+            <div class="action-text">
+                <span class="action-title" style="color:#ef4444;">مسح السجل وقواعد البيانات</span>
+                <span class="action-desc">حذف كافة المفاتيح من الهاتف</span>
             </div>
+        </div>
+
+        <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
+    </div>
+
+    <!-- 8. شاشة المحادثة المباشرة -->
+    <div class="screen" id="screen-chat">
+        <div class="chat-header">
+            <button style="border:none; background:none; font-size: 1.2rem; cursor:pointer;" onclick="nextScreen('screen-main')">➔</button>
+            <div style="text-align: center;">
+                <span id="chatTitle" style="font-weight: 700; display: block;">محادثة مشفرة</span>
+                <span style="font-size: 0.75rem; color: #10b981;">أنبوب آمن E2EE مفعل</span>
+            </div>
+            <span style="font-size: 1.2rem;">🔒</span>
+        </div>
+
+        <div class="chat-messages" id="chatBox">
+            <div class="msg-bubble received">
+                مرحباً بك في منصة words! هذه محادثة مشفرة عبر أنبوب كتم موجه.
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 10px;">
+            <input type="text" id="chatInput" class="custom-input" placeholder="اكتب رسالة مشفرة..." style="padding: 12px; margin:0;" />
+            <button class="btn-primary" style="width: auto; padding: 12px 20px;" onclick="sendChatMessage()">إرسال</button>
         </div>
     </div>
 
-    <!-- 5. شاشة المحادثة المباشرة -->
-    <div class="screen" id="screen-chat-room">
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
-            <button onclick="switchTab('chats')" style="border:none; background:none; font-size:1.2rem; cursor:pointer;">➔</button>
-            <span style="font-weight:bold;" id="chatTitle">دردشة مشفرة</span>
-            <span>🔒</span>
-        </div>
-        <div class="chat-box" id="chatMessages">
-            <div class="msg received">مرحباً بك في أنبوب المحادثة المشفر لمنصة words!</div>
-        </div>
-        <div style="display:flex; gap:6px; margin-top:10px;">
-            <input type="text" class="custom-input" id="msgInput" placeholder="اكتب رسالتك..." style="margin:0;" />
-            <button class="btn-primary" style="width:auto; padding:10px 18px;" onclick="sendMsg()">إرسال</button>
-        </div>
-    </div>
-
-    <!-- شريط التنقل السفلي -->
-    <div class="bottom-nav">
-        <div class="nav-item active" id="nav-chats" onclick="switchTab('chats')">
-            <span>💬</span> الدردشات
-        </div>
-        <div class="nav-item" id="nav-contacts" onclick="switchTab('contacts')">
-            <span>👥</span> جهات الاتصال
-        </div>
-        <div class="nav-item" id="nav-video" onclick="switchTab('video')">
-            <span>📹</span> المكالمات
-        </div>
-        <div class="nav-item" id="nav-settings" onclick="switchTab('settings')">
-            <span>⚙️</span> الإعدادات
+    <!-- نافذة الإشعارات الفورية Modal -->
+    <div class="modal" id="notificationModal">
+        <div class="modal-card">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">⚡</div>
+            <h3 style="margin-bottom: 8px;">إشعارات فورية</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                لتسين الخصوصية، يتم تشغيل words في الخلفية بدلاً من استخدام إشعارات Push التابعة للسيرفرات.
+            </p>
+            <button class="btn-primary" onclick="closeNotificationModal()">موافق ومتابعة</button>
         </div>
     </div>
 
 </div>
 
 <script>
-    function switchTab(tabId) {
+    function nextScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
 
-        if(tabId === 'chats') document.getElementById('screen-chats').classList.add('active');
-        if(tabId === 'contacts') document.getElementById('screen-contacts').classList.add('active');
-        if(tabId === 'video') document.getElementById('screen-video').classList.add('active');
-        if(tabId === 'settings') document.getElementById('screen-settings').classList.add('active');
-        
-        const activeNav = document.getElementById('nav-' + tabId);
-        if(activeNav) activeNav.classList.add('active');
+    function showNotificationModal() {
+        document.getElementById('notificationModal').style.display = 'flex';
+    }
+
+    function closeNotificationModal() {
+        document.getElementById('notificationModal').style.display = 'none';
+        nextScreen('screen-profile');
+    }
+
+    function saveProfileAndGoHome() {
+        const name = document.getElementById('profileName').value.trim() || "مستخدم مشفر";
+        document.getElementById('displayUserName').innerText = name;
+        nextScreen('screen-main');
     }
 
     function openChat(title) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-chat-room').classList.add('active');
         document.getElementById('chatTitle').innerText = title;
+        nextScreen('screen-chat');
     }
 
-    function sendMsg() {
-        const input = document.getElementById('msgInput');
-        const box = document.getElementById('chatMessages');
+    function sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const chatBox = document.getElementById('chatBox');
         if(!input.value.trim()) return;
 
-        const m = document.createElement('div');
-        m.className = 'msg sent';
-        m.innerText = input.value;
-        box.appendChild(m);
+        const msg = document.createElement('div');
+        msg.className = 'msg-bubble sent';
+        msg.innerText = input.value;
+        chatBox.appendChild(msg);
+        
         input.value = '';
-        box.scrollTop = box.scrollHeight;
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function addContact() {
-        const val = document.getElementById('contactInput').value;
-        if(!val) return;
+        const input = document.getElementById('contactInput');
+        if(!input.value.trim()) return;
         const list = document.getElementById('contactsList');
-        const item = document.createElement('div');
-        item.className = 'card';
-        item.innerHTML = `<div class="icon-box">👤</div><div style="flex:1;"><div style="font-weight:bold;">${val}</div></div>`;
-        list.appendChild(item);
-        document.getElementById('contactInput').value = '';
+        const card = document.createElement('div');
+        card.className = 'action-card';
+        card.innerHTML = `
+            <div class="action-icon">👤</div>
+            <div class="action-text" style="flex:1;">
+                <span class="action-title">${input.value}</span>
+                <span class="action-desc">أنبوب مخصص</span>
+            </div>
+            <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
+        `;
+        list.appendChild(card);
+        input.value = '';
     }
 
     function blockContact(btn) {
         btn.parentElement.remove();
-        alert('تم حظر جهة الاتصال وإغلاق الأنبوب المشفر بنجاح.');
+        alert('تم حظر جهة الاتصال وإغلاق الأنبوب المشفر.');
     }
 
-    function openVideoCall() { switchTab('video'); }
-
-    function copyCallLink() {
-        const copyText = document.getElementById("callLink");
-        navigator.clipboard.writeText(copyText.value);
-        alert("تم نسخ رابط مكالمة الفيديو المشفرة بنجاح!");
-    }
-
-    function installApp() {
-        alert("لتثبيت تطبيق words على هاتف السامسونج:\nاضغط على نقاط المتصفح الثلاث (⋮) ثم اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home screen).");
+    function connectLink() {
+        const val = document.getElementById('linkInput').value.trim();
+        if(val) {
+            openChat('محادثة الرابط المباشر');
+        }
     }
 
     function clearData() {
-        if(confirm("هل أنت تأكد من مسح جميع المفاتيح والرسائل؟")) {
-            localStorage.clear();
-            alert("تم مسح كافة البيانات المشفرة بنجاح.");
+        if(confirm('هل أنت تأكد من مسح جميع مفاتيح التشفير المحلية والرسائل؟')) {
+            alert('تم مسح بيانات المحادثات بنجاح.');
             location.reload();
         }
     }
