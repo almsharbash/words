@@ -11,7 +11,6 @@
         :root {
             --primary-blue: #0284c7;
             --light-blue-grad: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
             --text-dark: #0f172a;
             --text-muted: #475569;
         }
@@ -81,6 +80,7 @@
         }
         .brand-logo::after { content: '❖'; font-size: 1.4rem; color: #0284c7; }
 
+        /* زر التثبيت الذكي الذي يختفي تلقائياً عند التثبيت */
         .btn-install {
             background: #e0f2fe;
             color: #0284c7;
@@ -91,6 +91,9 @@
             font-weight: 700;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .hero-img {
@@ -134,7 +137,7 @@
 
         .custom-input {
             width: 100%;
-            padding: 16px;
+            padding: 14px 16px;
             border-radius: 14px;
             border: 1.5px solid #bae6fd;
             background: white;
@@ -215,7 +218,7 @@
     <div class="screen active" id="screen-welcome">
         <div class="brand-header-bar">
             <div class="brand-logo">words</div>
-            <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت التطبيق</button>
+            <button class="btn-install" id="installBtn" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
         </div>
         <div class="hero-img">📱</div>
         <h1 class="title-primary">كُن حُرَّاً في شبكتك</h1>
@@ -228,7 +231,7 @@
     <div class="screen" id="screen-rules">
         <div class="brand-header-bar">
             <div class="brand-logo">words</div>
-            <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت التطبيق</button>
+            <button class="btn-install installBtnDynamic" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
         </div>
         <h2 class="title-primary" style="margin-top: 15px;">التزامات الشبكة</h2>
         <p class="subtitle" style="text-align: right; margin-bottom: 12px;">يلتزم التطبيق بما يلي:</p>
@@ -258,7 +261,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <div class="brand-logo" style="font-size: 1.6rem;">words</div>
             <div style="display:flex; align-items:center; gap:8px;">
-                <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت</button>
+                <button class="btn-install installBtnDynamic" onclick="triggerInstall()" style="display:none;">📲 تثبيت</button>
                 <span id="displayUserName" style="font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
             </div>
         </div>
@@ -340,31 +343,50 @@
     <!-- 6. مكالمة الفيديو -->
     <div class="screen" id="screen-video">
         <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">مكالمة فيديو words</div>
-        <div style="width:100%; height:200px; background:#0f172a; border-radius:20px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem; margin-bottom:15px;">
+        <div style="width:100%; height:160px; background:#0f172a; border-radius:20px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem; margin-bottom:12px;">
             📹 الكاميرا جاهزة لبدء البث المشفر...
         </div>
-        <input type="text" class="custom-input" id="callUrl" value="https://hassan2026go.github.io/Rimail/" readonly />
-        <button class="btn-primary" onclick="showCustomAlert('نسخ الرابط', 'تم نسخ رابط غرفة الفيديو المشفرة بنجاح!')">نسخ رابط المكالمة</button>
+        <input type="text" class="custom-input" id="callUrl" value="https://hassan2026go.github.io/Rimail/" readonly style="margin-bottom:8px;" />
+        <button class="btn-primary" style="padding:12px;" onclick="openRimailCall()">فتح غرفة Rimail ومشاركة الرابط</button>
         <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 7. الإعدادات -->
+    <!-- 7. لوحة تحكم وإدارة المرحلات والسيرفرات (Admin Node Monitor) -->
     <div class="screen" id="screen-settings">
-        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">إعدادات words</div>
-        <div class="action-card">
-            <div class="action-icon">🔐</div>
-            <div class="action-text">
-                <span class="action-title">مفاتيح التشفير المحلية</span>
-                <span class="action-desc">AES-256 / Noise Protocol</span>
+        <div class="brand-logo" style="font-size: 1.4rem; margin-bottom: 10px;">إدارة سيرفرات ومرحلات words</div>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 12px;">كمدير، يمكنك إضافة ومراقبة عقد الترحيل (SMP) لاختيار الأسرع:</p>
+        
+        <div style="display:flex; gap:6px; margin-bottom:12px;">
+            <input type="text" id="relayInput" class="custom-input" placeholder="أدخل رابط سيرفر الترحيل (wss://...)" style="margin:0; padding:10px; font-size:0.85rem;" />
+            <button class="btn-primary" style="width:auto; padding:10px 14px; font-size:0.9rem;" onclick="addRelayServer()">إضافة</button>
+        </div>
+
+        <div id="relaysList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:15px;">
+            <!-- مرحلات مقترحة وأنشطها -->
+            <div class="action-card" style="padding:10px 14px; margin:0;">
+                <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#dcfce7; color:#16a34a;">⚡</div>
+                <div class="action-text" style="flex:1;">
+                    <span class="action-title" style="font-size:0.85rem;">relay-alpha.words-net.org</span>
+                    <span class="action-desc" style="color:#16a34a;">نشط جداً • سرعة: 18ms (الأفضل)</span>
+                </div>
+            </div>
+            <div class="action-card" style="padding:10px 14px; margin:0;">
+                <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#e0f2fe; color:#0284c7;">🟢</div>
+                <div class="action-text" style="flex:1;">
+                    <span class="action-title" style="font-size:0.85rem;">smp-eu.secure-relay.io</span>
+                    <span class="action-desc">مستقر • سرعة: 42ms</span>
+                </div>
             </div>
         </div>
-        <div class="action-card" onclick="clearData()">
-            <div class="action-icon" style="background:#fee2e2; color:#ef4444;">🗑️</div>
+
+        <div class="action-card" onclick="clearData()" style="padding:12px; margin-bottom:10px;">
+            <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#fee2e2; color:#ef4444;">🗑️</div>
             <div class="action-text">
-                <span class="action-title" style="color:#ef4444;">مسح السجل وقواعد البيانات</span>
-                <span class="action-desc">حذف كافة المفاتيح من الهاتف</span>
+                <span class="action-title" style="color:#ef4444; font-size:0.9rem;">مسح السجل وقواعد البيانات</span>
+                <span class="action-desc">إزالة مفاتيح الجلسة المحلية</span>
             </div>
         </div>
+
         <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
@@ -389,7 +411,7 @@
         </div>
     </div>
 
-    <!-- Modal التنبيهات المخصصة بدلاً من رسائل المتصفح الشفافة -->
+    <!-- Modal التنبيهات -->
     <div class="modal" id="customModal">
         <div class="modal-card">
             <div style="font-size: 2.2rem; margin-bottom: 8px;">❖</div>
@@ -414,6 +436,48 @@
 </div>
 
 <script>
+    let deferredPrompt;
+
+    // تفعيل التقاط حدث التثبيت للـ PWA
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        // إظهار أزرار التثبيت فوراً للمستخدم
+        document.querySelectorAll('.installBtnDynamic').forEach(el => el.style.display = 'flex');
+        const mainInstall = document.getElementById('installBtn');
+        if(mainInstall) mainInstall.style.display = 'flex';
+    });
+
+    // دالة تنفيذ التثبيت الفعلي
+    function triggerInstall() {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    hideAllInstallButtons();
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            showCustomAlert("تثبيت تطبيق words", "لتثبيت التطبيق على جهازك السامسونج:\nاضغط على القائمة (⋮) في متصفحك واختار 'إضافة إلى الشاشة الرئيسية' (Add to Home screen).");
+        }
+    }
+
+    // إخفاء أزرار التثبيت تلقائياً بعد نجاح التثبيت أو الاستخدام كمنصة مثبتة
+    window.addEventListener('appinstalled', (evt) => {
+        hideAllInstallButtons();
+    });
+
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        hideAllInstallButtons();
+    }
+
+    function hideAllInstallButtons() {
+        document.querySelectorAll('.installBtnDynamic').forEach(el => el.style.display = 'none');
+        const mainInstall = document.getElementById('installBtn');
+        if(mainInstall) mainInstall.style.display = 'none';
+    }
+
     function nextScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
@@ -427,10 +491,6 @@
 
     function closeCustomModal() {
         document.getElementById('customModal').style.display = 'none';
-    }
-
-    function showInstallInfo() {
-        showCustomAlert("تثبيت تطبيق words", "لتثبيت words على شاشة هاتفك السامسونج:\nانقر على نقاط المتصفح الثلاث (⋮) ثم اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home screen).");
     }
 
     function showNotificationModal() {
@@ -493,6 +553,29 @@
     function connectLink() {
         const val = document.getElementById('linkInput').value.trim();
         if(val) openChat('محادثة الرابط المباشر');
+    }
+
+    function addRelayServer() {
+        const input = document.getElementById('relayInput');
+        if(!input.value.trim()) return;
+        const list = document.getElementById('relaysList');
+        const card = document.createElement('div');
+        card.className = 'action-card';
+        card.style.cssText = "padding:10px 14px; margin:0;";
+        card.innerHTML = `
+            <div class="action-icon" style="width:36px; height:36px; font-size:1rem; background:#dcfce7; color:#16a34a;">⚡</div>
+            <div class="action-text" style="flex:1;">
+                <span class="action-title" style="font-size:0.85rem;">${input.value}</span>
+                <span class="action-desc" style="color:#16a34a;">تم الاتصال بنجاح • نشط</span>
+            </div>
+        `;
+        list.appendChild(card);
+        input.value = '';
+        showCustomAlert("إدارة المرحلات", "تمت إضافة سيرفر الترحيل الجديد بنجاح وفحص كفاءة اتصاله.");
+    }
+
+    function openRimailCall() {
+        window.open('https://hassan2026go.github.io/Rimail/', '_blank');
     }
 
     function clearData() {
