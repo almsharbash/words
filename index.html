@@ -4,22 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>words - شبكة المراسلة الآمنة</title>
-    <!-- استدعاء خط عصري تناسبي -->
+    <!-- Web App Manifest للتثبيت على الهاتف -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIndvcmRzIiwKICAic2hvcnRfbmFtZSI6ICJ3b3JkcyIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZTBmMmZlIiwKICAidGhlbWVfY29sb3IiOiAiIzAyODRjNyIKfQ==">
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #0284c7;
             --light-blue-grad: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 50%, #7dd3fc 100%);
             --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-card: rgba(255, 255, 255, 0.85);
             --text-dark: #0f172a;
             --text-muted: #475569;
         }
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Tajawal', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
@@ -32,10 +31,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 0;
         }
 
-        /* حاوية الهاتف الذكية */
         .app-container {
             width: 100%;
             max-width: 430px;
@@ -49,7 +46,6 @@
             overflow: hidden;
         }
 
-        /* شاشات التطبيق المتعددة */
         .screen {
             display: none;
             flex-direction: column;
@@ -59,65 +55,57 @@
             animation: fadeIn 0.3s ease-in-out;
         }
 
-        .screen.active {
-            display: flex;
-        }
+        .screen.active { display: flex; }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* عناصر الهوية والشعار */
+        .brand-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
         .brand-logo {
             font-size: 2.2rem;
             font-weight: 800;
             letter-spacing: -1px;
             color: #0369a1;
-            text-align: center;
-            margin-top: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
         }
+        .brand-logo::after { content: '❖'; font-size: 1.4rem; color: #0284c7; }
 
-        .brand-logo::after {
-            content: '❖';
-            font-size: 1.4rem;
+        .btn-install {
+            background: #e0f2fe;
             color: #0284c7;
+            border: 1px solid #bae6fd;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
         }
 
         .hero-img {
-            width: 140px;
-            height: 140px;
+            width: 140px; height: 140px;
             margin: 15px auto;
             background: #e0f2fe;
             border-radius: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             font-size: 3.5rem;
             box-shadow: 0 10px 25px rgba(2, 132, 199, 0.15);
         }
 
-        .title-primary {
-            font-size: 1.8rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 8px;
-            color: var(--text-dark);
-        }
+        .title-primary { font-size: 1.8rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
+        .subtitle { font-size: 1rem; text-align: center; color: var(--text-muted); line-height: 1.5; margin-bottom: 25px; }
 
-        .subtitle {
-            font-size: 1rem;
-            text-align: center;
-            color: var(--text-muted);
-            line-height: 1.5;
-            margin-bottom: 25px;
-        }
-
-        /* الأزرار العصرية */
         .btn-primary {
             background: #0284c7;
             color: white;
@@ -129,12 +117,7 @@
             width: 100%;
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
-            transition: all 0.2s;
             margin-top: auto;
-        }
-
-        .btn-primary:active {
-            transform: scale(0.98);
         }
 
         .btn-secondary {
@@ -149,11 +132,6 @@
             margin-top: 6px;
         }
 
-        /* حقول المدخلات */
-        .input-group {
-            margin-bottom: 20px;
-        }
-
         .custom-input {
             width: 100%;
             padding: 16px;
@@ -161,16 +139,9 @@
             border: 1.5px solid #bae6fd;
             background: white;
             font-size: 1rem;
-            color: var(--text-dark);
             outline: none;
-            transition: border 0.2s;
         }
 
-        .custom-input:focus {
-            border-color: #0284c7;
-        }
-
-        /* بطاقات الخيارات في الشاشة الرئيسية */
         .action-card {
             background: white;
             border-radius: 16px;
@@ -181,52 +152,29 @@
             gap: 14px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .action-card:active {
-            transform: scale(0.99);
         }
 
         .action-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             border-radius: 12px;
             background: #e0f2fe;
             color: #0284c7;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: bold;
         }
 
-        .action-text {
-            display: flex;
-            flex-direction: column;
-        }
+        .action-text { display: flex; flex-direction: column; }
+        .action-title { font-weight: 700; font-size: 0.98rem; }
+        .action-desc { font-size: 0.8rem; color: var(--text-muted); }
 
-        .action-title {
-            font-weight: 700;
-            font-size: 0.98rem;
-        }
-
-        .action-desc {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        /* نافذة الحوار المباشرة (Modal) */
         .modal {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(4px);
             display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 100;
+            align-items: center; justify-content: center;
+            padding: 20px; z-index: 100;
         }
 
         .modal-card {
@@ -238,94 +186,50 @@
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
 
-        /* قسم الدردشة والمكالمات */
         .chat-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding-bottom: 12px;
-            border-bottom: 1px solid #e2e8f0;
-            margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px;
         }
 
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding-bottom: 10px;
-        }
+        .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; }
+        .msg-bubble.sent { align-self: flex-start; background: #0284c7; color: white; border-bottom-right-radius: 4px; }
+        .msg-bubble.received { align-self: flex-end; background: white; color: var(--text-dark); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
 
-        .msg-bubble {
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 0.95rem;
-            line-height: 1.4;
-        }
-
-        .msg-bubble.sent {
-            align-self: flex-start;
-            background: #0284c7;
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .msg-bubble.received {
-            align-self: flex-end;
-            background: white;
-            color: var(--text-dark);
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        /* شريط الوصول السريع السفلي الأنيق */
         .quick-nav {
-            display: flex;
-            gap: 6px;
-            margin-top: 10px;
-            background: rgba(255,255,255,0.7);
-            padding: 6px;
-            border-radius: 16px;
+            display: flex; gap: 6px; margin-top: 10px;
+            background: rgba(255,255,255,0.7); padding: 6px; border-radius: 16px;
         }
-
         .quick-btn {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-weight: bold;
-            font-size: 0.82rem;
-            border-radius: 12px;
-            cursor: pointer;
+            flex: 1; padding: 10px; border: none; background: transparent;
+            color: var(--text-muted); font-weight: bold; font-size: 0.82rem; border-radius: 12px; cursor: pointer;
         }
-
-        .quick-btn.active {
-            background: white;
-            color: #0284c7;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
+        .quick-btn.active { background: white; color: #0284c7; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
 <div class="app-container">
 
-    <!-- 1. شاشة الترحيب الأولى -->
+    <!-- 1. شاشة الترحيب -->
     <div class="screen active" id="screen-welcome">
-        <div class="brand-logo">words</div>
+        <div class="brand-header-bar">
+            <div class="brand-logo">words</div>
+            <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت التطبيق</button>
+        </div>
         <div class="hero-img">📱</div>
         <h1 class="title-primary">كُن حُرَّاً في شبكتك</h1>
         <p class="subtitle">مُراسلة خاصة وآمنة بالكامل.<br>أول شبكة تمتلك فيها جهات اتصالك ومجموعاتك بنفسك.</p>
         <button class="btn-primary" onclick="nextScreen('screen-rules')">ابدأ الآن</button>
-        <button class="btn-secondary" onclick="alert('words مبني على بنية الأنابيب المشفرة بدون وجود خوادم مركزية تخزن بياناتك.')">لماذا بنينا words؟</button>
+        <button class="btn-secondary" onclick="showCustomAlert('لماذا بنينا words؟', 'منصة words مبنية على البنية المشفرة المستقلة بدون وجود خوادم مركزية تخزن بياناتك.')">لماذا بنينا words؟</button>
     </div>
 
-    <!-- 2. شاشة الشروط والالتزامات -->
+    <!-- 2. شاشة الشروط -->
     <div class="screen" id="screen-rules">
-        <div class="brand-logo">words</div>
+        <div class="brand-header-bar">
+            <div class="brand-logo">words</div>
+            <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت التطبيق</button>
+        </div>
         <h2 class="title-primary" style="margin-top: 15px;">التزامات الشبكة</h2>
         <p class="subtitle" style="text-align: right; margin-bottom: 12px;">يلتزم التطبيق بما يلي:</p>
         <div style="background: white; padding: 15px; border-radius: 14px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; color: var(--text-muted);">
@@ -337,28 +241,29 @@
         <button class="btn-primary" onclick="showNotificationModal()">اقبل واصل</button>
     </div>
 
-    <!-- 3. شاشة إنشاء ملف التعريف -->
+    <!-- 3. شاشة إنشاء الملف -->
     <div class="screen" id="screen-profile">
         <div class="brand-logo">words</div>
         <div class="hero-img" style="width: 90px; height: 90px; font-size: 2.2rem; margin-top: 10px;">👤</div>
         <h2 class="title-primary">ملف تعريفك</h2>
         <p class="subtitle">على جوالك فقط، وليس على الخوادم.<br>لا حساب، لا رقم هاتف، لا بريد إلكتروني.</p>
-        
         <div class="input-group">
             <input type="text" id="profileName" class="custom-input" placeholder="ادخل اسم ملف التعريف..." />
         </div>
-
         <button class="btn-primary" onclick="saveProfileAndGoHome()">أنشئ ملف تعريف</button>
     </div>
 
-    <!-- 4. الشاشة الرئيسية للتطبيق (مع الشريط السريع) -->
+    <!-- 4. الشاشة الرئيسية -->
     <div class="screen" id="screen-main">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <div class="brand-logo" style="font-size: 1.6rem; margin: 0;">words</div>
-            <span id="displayUserName" style="font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
+            <div class="brand-logo" style="font-size: 1.6rem;">words</div>
+            <div style="display:flex; align-items:center; gap:8px;">
+                <button class="btn-install" onclick="showInstallInfo()">📲 تثبيت</button>
+                <span id="displayUserName" style="font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem;"></span>
+            </div>
         </div>
 
-        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 10px;">تحدث مع شخص ما</p>
+        <p style="font-size: 0.85rem; font-weight: bold; color: var(--text-muted); margin-bottom: 10px;">تحدث مع شخص ما في words</p>
 
         <div class="action-card" onclick="openChat('رابط خاص')">
             <div class="action-icon">🔗</div>
@@ -379,7 +284,7 @@
         <div class="action-card" onclick="openChat('مجموعة جديدة')">
             <div class="action-icon">👥</div>
             <div class="action-text">
-                <span class="action-title">أنشئ مجموعة</span>
+                <span class="action-title">أنشئ مجموعة words</span>
                 <span class="action-desc">محادثة جماعية مشفرة بين أطراف متعددة</span>
             </div>
         </div>
@@ -395,7 +300,7 @@
         <div class="action-card" onclick="nextScreen('screen-video')">
             <div class="action-icon" style="background:#fef3c7; color:#d97706;">📹</div>
             <div class="action-text">
-                <span class="action-title">مكالمة فيديو مشفرة</span>
+                <span class="action-title">مكالمة فيديو words</span>
                 <span class="action-desc">اتصال مرئي مباشر عبر WebRTC</span>
             </div>
         </div>
@@ -405,7 +310,6 @@
             <button class="btn-primary" style="width: auto; padding: 12px 18px;" onclick="connectLink()">ربط</button>
         </div>
 
-        <!-- شريط الخيارات الذكي في الأسفل -->
         <div class="quick-nav">
             <button class="quick-btn active" onclick="nextScreen('screen-main')">الرئيسية</button>
             <button class="quick-btn" onclick="nextScreen('screen-contacts')">جهات الاتصال</button>
@@ -413,47 +317,40 @@
         </div>
     </div>
 
-    <!-- 5. شاشة جهات الاتصال والحظر -->
+    <!-- 5. جهات الاتصال -->
     <div class="screen" id="screen-contacts">
         <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">جهات الاتصال والحظر</div>
-        
         <div style="display:flex; gap:6px; margin-bottom:15px;">
-            <input type="text" id="contactInput" class="custom-input" placeholder="معرف الأنبوب..." style="margin:0; padding:12px;" />
+            <input type="text" id="contactInput" class="custom-input" placeholder="معرف words..." style="margin:0; padding:12px;" />
             <button class="btn-primary" style="width:auto; padding:12px;" onclick="addContact()">إضافة</button>
         </div>
-
         <div id="contactsList">
             <div class="action-card">
                 <div class="action-icon">👤</div>
                 <div class="action-text" style="flex:1;">
-                    <span class="action-title">جهة اتصال آمنة</span>
-                    <span class="action-desc">أنبوب E2EE موجه</span>
+                    <span class="action-title">جهة اتصال words</span>
+                    <span class="action-desc">مسار E2EE موجه</span>
                 </div>
                 <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
             </div>
         </div>
-
         <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 6. شاشة مكالمة الفيديو -->
+    <!-- 6. مكالمة الفيديو -->
     <div class="screen" id="screen-video">
-        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">مكالمة فيديو WebRTC</div>
-        
+        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">مكالمة فيديو words</div>
         <div style="width:100%; height:200px; background:#0f172a; border-radius:20px; display:flex; align-items:center; justify-content:center; color:white; font-size:0.9rem; margin-bottom:15px;">
             📹 الكاميرا جاهزة لبدء البث المشفر...
         </div>
-
-        <input type="text" class="custom-input" value="https://words.app/call?room=secret_99" readonly />
-        <button class="btn-primary" onclick="alert('تم نسخ رابط غرفة الفيديو بنجاح!')">نسخ رابط المكالمة</button>
-        
+        <input type="text" class="custom-input" id="callUrl" value="https://hassan2026go.github.io/Rimail/" readonly />
+        <button class="btn-primary" onclick="showCustomAlert('نسخ الرابط', 'تم نسخ رابط غرفة الفيديو المشفرة بنجاح!')">نسخ رابط المكالمة</button>
         <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 7. شاشة الإعدادات -->
+    <!-- 7. الإعدادات -->
     <div class="screen" id="screen-settings">
-        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">الإعدادات والتشفير</div>
-        
+        <div class="brand-logo" style="font-size: 1.5rem; margin-bottom: 15px;">إعدادات words</div>
         <div class="action-card">
             <div class="action-icon">🔐</div>
             <div class="action-text">
@@ -461,7 +358,6 @@
                 <span class="action-desc">AES-256 / Noise Protocol</span>
             </div>
         </div>
-
         <div class="action-card" onclick="clearData()">
             <div class="action-icon" style="background:#fee2e2; color:#ef4444;">🗑️</div>
             <div class="action-text">
@@ -469,40 +365,47 @@
                 <span class="action-desc">حذف كافة المفاتيح من الهاتف</span>
             </div>
         </div>
-
         <button class="btn-secondary" style="margin-top:auto;" onclick="nextScreen('screen-main')">➔ العودة للرئيسية</button>
     </div>
 
-    <!-- 8. شاشة المحادثة المباشرة -->
+    <!-- 8. الدردشة المباشرة -->
     <div class="screen" id="screen-chat">
         <div class="chat-header">
             <button style="border:none; background:none; font-size: 1.2rem; cursor:pointer;" onclick="nextScreen('screen-main')">➔</button>
             <div style="text-align: center;">
-                <span id="chatTitle" style="font-weight: 700; display: block;">محادثة مشفرة</span>
-                <span style="font-size: 0.75rem; color: #10b981;">أنبوب آمن E2EE مفعل</span>
+                <span id="chatTitle" style="font-weight: 700; display: block;">محادثة words المشفرة</span>
+                <span style="font-size: 0.75rem; color: #10b981;">مسار words الآمن E2EE مفعل</span>
             </div>
             <span style="font-size: 1.2rem;">🔒</span>
         </div>
-
         <div class="chat-messages" id="chatBox">
             <div class="msg-bubble received">
-                مرحباً بك في منصة words! هذه محادثة مشفرة عبر أنبوب كتم موجه.
+                مرحباً بك في منصة words! هذه محادثة مشفرة آمنة وموجهة.
             </div>
         </div>
-
         <div style="display: flex; gap: 8px; margin-top: 10px;">
             <input type="text" id="chatInput" class="custom-input" placeholder="اكتب رسالة مشفرة..." style="padding: 12px; margin:0;" />
             <button class="btn-primary" style="width: auto; padding: 12px 20px;" onclick="sendChatMessage()">إرسال</button>
         </div>
     </div>
 
-    <!-- نافذة الإشعارات الفورية Modal -->
+    <!-- Modal التنبيهات المخصصة بدلاً من رسائل المتصفح الشفافة -->
+    <div class="modal" id="customModal">
+        <div class="modal-card">
+            <div style="font-size: 2.2rem; margin-bottom: 8px;">❖</div>
+            <h3 id="modalTitle" style="margin-bottom: 8px;">words</h3>
+            <p id="modalBody" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height:1.5;"></p>
+            <button class="btn-primary" onclick="closeCustomModal()">حسناً</button>
+        </div>
+    </div>
+
+    <!-- Modal الإشعارات -->
     <div class="modal" id="notificationModal">
         <div class="modal-card">
             <div style="font-size: 2.5rem; margin-bottom: 10px;">⚡</div>
             <h3 style="margin-bottom: 8px;">إشعارات فورية</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-                لتسين الخصوصية، يتم تشغيل words في الخلفية بدلاً من استخدام إشعارات Push التابعة للسيرفرات.
+                لتنسيق الخصوصية، يتم تشغيل words في الخلفية بدلاً من استخدام إشعارات Push التابعة للسيرفرات.
             </p>
             <button class="btn-primary" onclick="closeNotificationModal()">موافق ومتابعة</button>
         </div>
@@ -514,6 +417,20 @@
     function nextScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(screenId).classList.add('active');
+    }
+
+    function showCustomAlert(title, message) {
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalBody').innerText = message;
+        document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function closeCustomModal() {
+        document.getElementById('customModal').style.display = 'none';
+    }
+
+    function showInstallInfo() {
+        showCustomAlert("تثبيت تطبيق words", "لتثبيت words على شاشة هاتفك السامسونج:\nانقر على نقاط المتصفح الثلاث (⋮) ثم اختر 'إضافة إلى الشاشة الرئيسية' (Add to Home screen).");
     }
 
     function showNotificationModal() {
@@ -560,7 +477,7 @@
             <div class="action-icon">👤</div>
             <div class="action-text" style="flex:1;">
                 <span class="action-title">${input.value}</span>
-                <span class="action-desc">أنبوب مخصص</span>
+                <span class="action-desc">مسار words مخصص</span>
             </div>
             <button onclick="blockContact(this)" style="border:none; background:#fee2e2; color:#ef4444; padding:6px 10px; border-radius:8px; font-weight:bold; cursor:pointer;">حظر</button>
         `;
@@ -570,21 +487,16 @@
 
     function blockContact(btn) {
         btn.parentElement.remove();
-        alert('تم حظر جهة الاتصال وإغلاق الأنبوب المشفر.');
+        showCustomAlert("حظر جهة اتصال", "تم حظر جهة الاتصال وإغلاق مسار words المشفر.");
     }
 
     function connectLink() {
         const val = document.getElementById('linkInput').value.trim();
-        if(val) {
-            openChat('محادثة الرابط المباشر');
-        }
+        if(val) openChat('محادثة الرابط المباشر');
     }
 
     function clearData() {
-        if(confirm('هل أنت تأكد من مسح جميع مفاتيح التشفير المحلية والرسائل؟')) {
-            alert('تم مسح بيانات المحادثات بنجاح.');
-            location.reload();
-        }
+        showCustomAlert("مسح البيانات", "تم مسح كافة البيانات والمفاتيح المشفرة من الجهاز بنجاح.");
     }
 </script>
 
