@@ -1833,7 +1833,7 @@ select.custom-input { appearance: auto; }
   const installedFlag = () => { try { return localStorage.getItem(LS_INSTALLED) === '1'; } catch (_) { return false; } };
   const setInstalledFlag = (v) => { try { if (v) localStorage.setItem(LS_INSTALLED, '1'); else localStorage.removeItem(LS_INSTALLED); } catch (_) { /* */ } };
   // الزر يظهر فقط حين يعلن المتصفح أن التثبيت ممكن فعلاً (أو على آيفون حيث لا واجهة برمجية)، ويختفي بعد التثبيت
-  const canInstall = () => !isStandalone() && (!!installPrompt || (isIOSSafari() && !installedFlag()));
+  const canInstall = () => !isStandalone() && (!!installPrompt || !installedFlag());
   function refreshInstall() {
     const ok = canInstall();
     document.querySelectorAll('.installBtnDynamic').forEach((b) => b.classList.toggle('show', ok));
@@ -1862,7 +1862,15 @@ select.custom-input { appearance: auto; }
       });
       return;
     }
-    if (isIOSSafari()) iosInstallSheet();
+    if (isIOSSafari()) return iosInstallSheet();
+    openModal((c, close) => c.append(h('img', { class: 'modal-logo', src: window.WORDS_LOGO, alt: '' }), h('h3', null, 'تثبيت words'),
+      h('div', { class: 'body node' },
+        h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '١) اضغط قائمة المتصفح ⋮')),
+        h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '٢) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»')),
+        h('div', { class: 'small muted' }, 'إن لم يظهر الخيار فافتح الرابط في متصفح Chrome ثم أعد تحميل الصفحة.')),
+      h('div', { class: 'modal-actions' },
+        h('button', { class: 'btn-primary', onclick: () => { setInstalledFlag(true); close(); refreshInstall(); } }, 'تمّ التثبيت'),
+        h('button', { class: 'btn-secondary', onclick: close }, 'إغلاق'))));
   }
   /* فحص جاهزية التثبيت: أداة للمشرف داخل لوحة الإدارة فقط */
   async function installChecks() {
