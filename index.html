@@ -593,7 +593,7 @@ select.custom-input { appearance: auto; }
   };
   const DEFAULT_RELAYS = ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://offchain.pub'];
   const DEFAULT_ICE = ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'];
-  const VERSION = 'v4.2';
+  const VERSION = 'v4.3';
   const LS_STATE = 'words.state.v1', LS_MSGS = 'words.msgs.v1', LS_INSTALLED = 'words.installed';
   const LINKS = { K: 'https://almsharbash.github.io/lmlm2005/', R: 'https://hassan2026go.github.io/Rimail/' }; // روابط التذييل (قابلة للتعديل من لوحة الإدارة)
 
@@ -1316,7 +1316,7 @@ select.custom-input { appearance: auto; }
       h('button', { class: 'btn-primary', onclick: () => show('rules') }, 'ابدأ الآن'),
       h('button', { class: 'btn-install-wide', 'data-install': '1', style: 'display:none', onclick: triggerInstall }, '📲 تثبيت words على جهازك'),
       h('button', { class: 'btn-secondary', onclick: () => uiInfo('لماذا words؟', 'لا يوجد خادم مركزي يملك حسابك أو جهات اتصالك. تُرسَل الرسائل مشفّرة عبر مرحّلات Nostr العامة التي تختارها أنت، ولا يستطيع أحد قراءتها سوى المستلم. مفتاحك يبقى على جهازك.') }, 'لماذا words؟'),
-      h('div', { class: 'small muted', style: 'text-align:center;margin-top:8px;opacity:.6', dir: 'ltr' }, 'words ' + VERSION));
+      h('div', { class: 'small muted ver-line', style: 'text-align:center;margin-top:8px;opacity:.6', dir: 'ltr' }, 'words ' + VERSION));
     // الشروط
     const r = mk('rules');
     r.append(h('div', { class: 'brand-header-bar' }, logoEl(), installBtn()),
@@ -1833,14 +1833,16 @@ select.custom-input { appearance: auto; }
   const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
   const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const isIOSSafari = () => isIOS() && !/crios|fxios|edgios|opios/i.test(navigator.userAgent);
-  const installedFlag = () => { try { return localStorage.getItem(LS_INSTALLED) === '1'; } catch (_) { return false; } };
-  const setInstalledFlag = (v) => { try { if (v) localStorage.setItem(LS_INSTALLED, '1'); else localStorage.removeItem(LS_INSTALLED); } catch (_) { /* */ } };
+  // علامة «ثُبّت» تنتهي بعد 12 ساعة حتى لا تُخفي الزر إلى الأبد إن حُذف التطبيق
+  const installedFlag = () => { try { const t = +localStorage.getItem(LS_INSTALLED); return t > 0 && Date.now() - t < 43200000; } catch (_) { return false; } };
+  const setInstalledFlag = (v) => { try { if (v) localStorage.setItem(LS_INSTALLED, String(Date.now())); else localStorage.removeItem(LS_INSTALLED); } catch (_) { /* */ } };
   // الزر يظهر فقط حين يعلن المتصفح أن التثبيت ممكن فعلاً (أو على آيفون حيث لا واجهة برمجية)، ويختفي بعد التثبيت
   const canInstall = () => !isStandalone() && (!!installPrompt || !installedFlag());
   function refreshInstall() {
     const ok = canInstall();
     document.querySelectorAll('.installBtnDynamic').forEach((b) => b.classList.toggle('show', ok));
     document.querySelectorAll('[data-install]').forEach((b) => { b.style.display = ok ? '' : 'none'; });
+    document.querySelectorAll('.ver-line').forEach((e) => { e.textContent = 'words ' + VERSION + ' · ' + (isStandalone() ? 'S' : '-') + (installPrompt ? 'P' : '-') + (installedFlag() ? 'F' : '-'); });
   }
   function iosInstallSheet() {
     openModal((c, close) => c.append(h('img', { class: 'modal-logo', src: window.WORDS_LOGO, alt: '' }), h('h3', null, 'تثبيت words على الآيفون'),
