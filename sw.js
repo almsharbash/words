@@ -1,6 +1,6 @@
 /* words — Service Worker: تخزين مؤقت لقشرة التطبيق ليعمل دون اتصال، ويُظهر الإشعارات المحلية.
    لا يستخدم Push من أي خادم، ولا يلمس طلبات WebSocket للمرحّلات. */
-const CACHE = 'words-shell-v2';
+const CACHE = 'words-shell-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
 
 self.addEventListener('install', (e) => {
