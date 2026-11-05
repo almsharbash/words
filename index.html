@@ -593,7 +593,7 @@ select.custom-input { appearance: auto; }
   };
   const DEFAULT_RELAYS = ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://offchain.pub'];
   const DEFAULT_ICE = ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'];
-  const VERSION = 'v4.3';
+  const VERSION = 'v4.4';
   const LS_STATE = 'words.state.v1', LS_MSGS = 'words.msgs.v1', LS_INSTALLED = 'words.installed';
   const LINKS = { K: 'https://almsharbash.github.io/lmlm2005/', R: 'https://hassan2026go.github.io/Rimail/' }; // روابط التذييل (قابلة للتعديل من لوحة الإدارة)
 
@@ -1837,7 +1837,8 @@ select.custom-input { appearance: auto; }
   const installedFlag = () => { try { const t = +localStorage.getItem(LS_INSTALLED); return t > 0 && Date.now() - t < 43200000; } catch (_) { return false; } };
   const setInstalledFlag = (v) => { try { if (v) localStorage.setItem(LS_INSTALLED, String(Date.now())); else localStorage.removeItem(LS_INSTALLED); } catch (_) { /* */ } };
   // الزر يظهر فقط حين يعلن المتصفح أن التثبيت ممكن فعلاً (أو على آيفون حيث لا واجهة برمجية)، ويختفي بعد التثبيت
-  const canInstall = () => !isStandalone() && (!!installPrompt || !installedFlag());
+  let installedNow = false; // ثُبّت خلال هذه الجلسة
+  const canInstall = () => !isStandalone() && !installedNow && (!!installPrompt || !isIOS() || !installedFlag());
   function refreshInstall() {
     const ok = canInstall();
     document.querySelectorAll('.installBtnDynamic').forEach((b) => b.classList.toggle('show', ok));
@@ -1863,7 +1864,7 @@ select.custom-input { appearance: auto; }
       try { res = Promise.resolve(ev.prompt()); } catch (err) { res = Promise.reject(err); }
       res.then(() => ev.userChoice).then((r) => {
         if (r && r.outcome === 'accepted') {
-          setInstalledFlag(true); refreshInstall();
+          installedNow = true; setInstalledFlag(true); refreshInstall();
           uiInfo('جارٍ التثبيت', 'وافق المتصفح على التثبيت. ستظهر أيقونة words على شاشتك الرئيسية خلال ثوانٍ (قد يستغرق Chrome لحظات لتجهيز التطبيق).', 'حسناً', true);
         } else { toast('أُلغي التثبيت'); refreshInstall(); }
       }).catch((err) => { toast('تعذّر فتح نافذة التثبيت: ' + ((err && err.message) || err)); refreshInstall(); });
@@ -1875,7 +1876,7 @@ select.custom-input { appearance: auto; }
         h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '١) اضغط قائمة المتصفح ⋮')),
         h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '٢) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»')),
         h('div', { class: 'small muted' }, 'إن لم يظهر الخيار فافتح الرابط في متصفح Chrome ثم أعد تحميل الصفحة.'),
-        h('div', { class: 'small muted', style: 'margin-top:6px' }, 'حالة المتصفح: ' + (promptSeen ? 'أُرسل حدث التثبيت سابقاً واستُعمل.' : 'لم يُرسل المتصفح حدث التثبيت بعد (انتظر بضع ثوانٍ بعد فتح الصفحة، أو التطبيق مثبّت أصلاً).'))),
+        h('div', { class: 'small muted', style: 'margin-top:6px' }, 'المتصفح: ' + ((navigator.userAgent.match(/(SamsungBrowser|EdgA|OPR|Firefox|Chrome|Safari)\/[\d.]+/) || ['غير معروف'])[0]) + ' — ' + (promptSeen ? 'أُرسل حدث التثبيت سابقاً واستُعمل.' : 'لم يُرسل المتصفح حدث التثبيت بعد (انتظر بضع ثوانٍ بعد فتح الصفحة، أو التطبيق مثبّت أصلاً).'))),
       h('div', { class: 'modal-actions' },
         h('button', { class: 'btn-primary', onclick: () => { setInstalledFlag(true); close(); refreshInstall(); } }, 'تمّ التثبيت'),
         h('button', { class: 'btn-secondary', onclick: close }, 'إغلاق'))));
@@ -1912,7 +1913,7 @@ select.custom-input { appearance: auto; }
   }
   let promptSeen = false;
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptSeen = true; installPrompt = e; setInstalledFlag(false); refreshInstall(); });
-  window.addEventListener('appinstalled', () => { installPrompt = null; setInstalledFlag(true); toast('تم تثبيت words بنجاح ✓'); refreshInstall(); });
+  window.addEventListener('appinstalled', () => { installPrompt = null; installedNow = true; setInstalledFlag(true); toast('تم تثبيت words بنجاح ✓'); refreshInstall(); });
   try { window.matchMedia('(display-mode: standalone)').addEventListener('change', refreshInstall); } catch (_) { /* */ }
 
   /* ============ لوحة الإدارة السرّية ============ */
