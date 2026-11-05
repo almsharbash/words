@@ -1853,13 +1853,15 @@ select.custom-input { appearance: auto; }
     if (isStandalone()) return refreshInstall();
     if (installPrompt) {
       const ev = installPrompt;
-      Promise.resolve(ev.prompt()).catch(() => { /* */ });
-      ev.userChoice.then((r) => {
-        installPrompt = null;
-        if (r && r.outcome === 'accepted') { setInstalledFlag(true); toast('جارٍ تثبيت words…'); }
-        else toast('لم يكتمل التثبيت. يمكنك المحاولة لاحقاً.');
-        refreshInstall();
-      });
+      installPrompt = null; // الحدث يُستعمل مرة واحدة فقط
+      let res;
+      try { res = Promise.resolve(ev.prompt()); } catch (err) { res = Promise.reject(err); }
+      res.then(() => ev.userChoice).then((r) => {
+        if (r && r.outcome === 'accepted') {
+          setInstalledFlag(true); refreshInstall();
+          uiInfo('جارٍ التثبيت', 'وافق المتصفح على التثبيت. ستظهر أيقونة words على شاشتك الرئيسية خلال ثوانٍ (قد يستغرق Chrome لحظات لتجهيز التطبيق).', 'حسناً', true);
+        } else { toast('أُلغي التثبيت'); refreshInstall(); }
+      }).catch((err) => { toast('تعذّر فتح نافذة التثبيت: ' + ((err && err.message) || err)); refreshInstall(); });
       return;
     }
     if (isIOSSafari()) return iosInstallSheet();
@@ -1867,7 +1869,8 @@ select.custom-input { appearance: auto; }
       h('div', { class: 'body node' },
         h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '١) اضغط قائمة المتصفح ⋮')),
         h('div', { class: 'pf-row' }, h('span', { class: 'k' }, '٢) اختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية»')),
-        h('div', { class: 'small muted' }, 'إن لم يظهر الخيار فافتح الرابط في متصفح Chrome ثم أعد تحميل الصفحة.')),
+        h('div', { class: 'small muted' }, 'إن لم يظهر الخيار فافتح الرابط في متصفح Chrome ثم أعد تحميل الصفحة.'),
+        h('div', { class: 'small muted', style: 'margin-top:6px' }, 'حالة المتصفح: ' + (promptSeen ? 'أُرسل حدث التثبيت سابقاً واستُعمل.' : 'لم يُرسل المتصفح حدث التثبيت بعد (انتظر بضع ثوانٍ بعد فتح الصفحة، أو التطبيق مثبّت أصلاً).'))),
       h('div', { class: 'modal-actions' },
         h('button', { class: 'btn-primary', onclick: () => { setInstalledFlag(true); close(); refreshInstall(); } }, 'تمّ التثبيت'),
         h('button', { class: 'btn-secondary', onclick: close }, 'إغلاق'))));
@@ -1902,7 +1905,8 @@ select.custom-input { appearance: auto; }
       ...rows.map(([t, ok, fix]) => h('div', { class: 'pf-row' }, h('span', { class: 'k' }, (ok ? '✅ ' : '❌ ') + t), ok ? null : h('span', { class: 'v small', style: 'color:var(--danger)' }, fix))),
       h('button', { class: 'btn-small mt', onclick: () => { closeModal(); showInstallHelp(); } }, 'إعادة الفحص'));
   }
-  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); installPrompt = e; setInstalledFlag(false); refreshInstall(); });
+  let promptSeen = false;
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptSeen = true; installPrompt = e; setInstalledFlag(false); refreshInstall(); });
   window.addEventListener('appinstalled', () => { installPrompt = null; setInstalledFlag(true); toast('تم تثبيت words بنجاح ✓'); refreshInstall(); });
   try { window.matchMedia('(display-mode: standalone)').addEventListener('change', refreshInstall); } catch (_) { /* */ }
 
