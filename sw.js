@@ -1,7 +1,7 @@
 /* words — Service Worker: تخزين مؤقت لقشرة التطبيق ليعمل دون اتصال، ويُظهر الإشعارات المحلية.
    لا يستخدم Push من أي خادم، ولا يلمس طلبات WebSocket للمرحّلات. */
-const CACHE = 'words-shell-v7';
-const SHELL = ['./', 'index.html', 'style.css', ...['crypto-core','logo','app-base','identity-profile','messages-relays','events-send','calls','modals','screens-shell','screens-chat','screens-settings','install','vault','admin','main'].map((n) => n + '.js'), 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'apple-touch-icon.png', 'favicon-32.png'];
+const CACHE = 'words-shell-v8';
+const SHELL = ['./', 'index.html', 'style.css', ...['crypto-core','logo','app-base','identity-profile','messages-relays','events-send','calls','modals','screens-shell','screens-chat','screens-settings','install','vault','network','admin','main'].map((n) => n + '.js'), 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'maskable-512.png', 'apple-touch-icon.png', 'favicon-32.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => null)))).then(() => self.skipWaiting()));

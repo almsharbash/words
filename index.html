@@ -596,7 +596,7 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
   };
   const DEFAULT_RELAYS = ['wss://relay.damus.io', 'wss://nos.lol', 'wss://relay.primal.net', 'wss://offchain.pub'];
   const DEFAULT_ICE = ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'];
-  const VERSION = 'v5.1';
+  const VERSION = 'v5.2';
   const LS_STATE = 'words.state.v1', LS_MSGS = 'words.msgs.v1', LS_INSTALLED = 'words.installed';
   const LINKS = { K: 'https://almsharbash.github.io/lmlm2005/', R: 'https://hassan2026go.github.io/Rimail/' }; // روابط التذييل (قابلة للتعديل من لوحة الإدارة)
 
@@ -1113,7 +1113,7 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
 'use strict';
   /* ============ المكالمات (WebRTC + إشارة عبر المرحّلات) ============ */
   const Call = { state: 'idle', pc: null, stream: null, peer: null, callId: null, timer: null, incoming: null, mic: true, cam: true };
-  const iceServers = () => state.ice.map((s) => { const o = { urls: s.urls }; if (s.username) { o.username = s.username; o.credential = s.credential || ''; } return o; });
+  const iceServers = () => effectiveIce().map((s) => { const o = { urls: s.urls }; if (s.username) { o.username = s.username; o.credential = s.credential || ''; } return o; });
   async function getMedia() {
     try { return await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'user' } }); }
     catch (_) { return await navigator.mediaDevices.getUserMedia({ audio: true }); }
@@ -2032,6 +2032,65 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
     show('lock'); setTimeout(() => inp.focus(), 100);
   }
 
+/* words — الشبكة المنشورة للجميع: ملف network.json في جذر الموقع (مرحّلات وخوادم مكالمات يضيفها المشرف)
+   يقرؤه كل تثبيت عند التشغيل ويدمجه مع إعدادات المستخدم دون أن يضيف أحد شيئاً يدوياً. */
+'use strict';
+  const NETWORK_FILE = 'network.json';
+  const okRelay = (u) => typeof u === 'string' && u.length < 200 && /^(wss:\/\/[^\s/]+|ws:\/\/(localhost|127\.0\.0\.1)(:\d+)?)(\/\S*)?$/.test(u);
+  function sanitizeNetwork(j) {
+    if (!j || typeof j !== 'object') return null;
+    const relays = [...new Set((Array.isArray(j.relays) ? j.relays : []).filter(okRelay))].slice(0, 12);
+    const ice = (Array.isArray(j.ice) ? j.ice : []).filter((s) => s && typeof s.urls === 'string' && /^(stun|turns?):[^\s]+$/.test(s.urls)).slice(0, 8)
+      .map((s) => { const o = { urls: s.urls }; if (typeof s.username === 'string' && s.username) { o.username = s.username.slice(0, 120); o.credential = String(s.credential || '').slice(0, 200); } return o; });
+    return relays.length || ice.length ? { relays, ice } : null;
+  }
+  const publishedRelays = () => (state.published && Array.isArray(state.published.relays) ? state.published.relays : []);
+  const publishedIce = () => (state.published && Array.isArray(state.published.ice) ? state.published.ice : []);
+  /* مرحّلات المستخدم + المنشورة (التي لا تتكرر). المنشورة تعمل دائماً ولا تُحذف من جهاز المستخدم. */
+  function effectiveRelays() {
+    const have = new Set(state.relays.map((r) => r.url));
+    return state.relays.concat(publishedRelays().filter((u) => !have.has(u)).map((u) => ({ url: u, enabled: true, official: true })));
+  }
+  function effectiveIce() {
+    const have = new Set(state.ice.map((s) => s.urls));
+    return state.ice.concat(publishedIce().filter((s) => !have.has(s.urls)));
+  }
+  function applyNetwork() { pool.setRelays(effectiveRelays()); syncSubs(); if (cur === 'admin') updateAdminLive(); }
+  async function fetchNetwork() {
+    if (!/^https?:$/.test(location.protocol)) return false;
+    try {
+      const r = await fetch(NETWORK_FILE + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) return false;
+      const j = sanitizeNetwork(await r.json()); if (!j) return false;
+      const changed = JSON.stringify(j) !== JSON.stringify({ relays: publishedRelays(), ice: publishedIce() });
+      state.published = { relays: j.relays, ice: j.ice, at: Date.now() }; save();
+      if (changed) applyNetwork();
+      return true;
+    } catch (_) { return false; } // دون اتصال: نُبقي آخر قائمة محفوظة
+  }
+  /* نص network.json الذي يضعه المشرف في المستودع، مبنياً من إعداداته الحالية */
+  function networkFileText() {
+    const relays = state.relays.filter((r) => r.enabled && okRelay(r.url)).map((r) => r.url);
+    const ice = state.ice.map((s) => { const o = { urls: s.urls }; if (s.username) { o.username = s.username; o.credential = s.credential || ''; } return o; });
+    return JSON.stringify({ v: 1, relays, ice }, null, 2) + '\n';
+  }
+  function publishNetworkCard() {
+    const pr = publishedRelays();
+    return h('div', null,
+      h('div', { class: 'box small' }, 'المرحّلات المنشورة تصل كل المستخدمين تلقائياً من ملف ', h('b', { class: 'ltr' }, 'network.json'), ' في موقعك، دون أن يضيفوا شيئاً. ',
+        pr.length ? 'المنشورة الآن عندك: ' + pr.length + ' مرحّل، و' + publishedIce().length + ' خادم مكالمات.' : 'لا توجد قائمة منشورة محمّلة بعد.'),
+      ...pr.map((u) => h('div', { class: 'pf-row' }, h('span', { class: 'k ltr' }, u), h('span', { class: 'v small' }, 'رسمي'))),
+      h('div', { class: 'action-card', onclick: async () => {
+        const text = networkFileText();
+        await uiInfo('ملف network.json', h('div', null,
+          h('div', { class: 'small muted mb' }, '١) انسخ النص أدناه. ٢) في مستودع GitHub افتح network.json واضغط تعديل والصقه بدل المحتوى ثم احفظ. ٣) خلال دقائق يستفيد منه كل المستخدمين عند فتح التطبيق.'),
+          h('textarea', { class: 'custom-input ltr', rows: 9, readOnly: true, value: text, onfocus: (e) => e.target.select() }),
+          h('div', { class: 'box warn mt small' }, 'كلمات مرور خوادم TURN تصبح علنية داخل الملف لأن الموقع عام. استعمل حساباً مخصصاً محدود الاستهلاك.'),
+          h('button', { class: 'btn-primary mt', onclick: () => copyText(text) }, 'نسخ النص')), 'إغلاق');
+      } }, h('div', { class: 'action-icon' }, '📤'), h('div', { class: 'action-text' }, h('span', { class: 'action-title' }, 'تجهيز ملف network.json للنشر'), h('span', { class: 'action-desc' }, 'يبني الملف من مرحّلاتك وخوادمك الحالية'))),
+      h('div', { class: 'action-card', onclick: async () => toast((await fetchNetwork()) ? 'تم تحديث القائمة المنشورة' : 'تعذّر قراءة network.json'), }, h('div', { class: 'action-icon' }, '🔄'), h('div', { class: 'action-text' }, h('span', { class: 'action-title' }, 'تحديث القائمة المنشورة الآن'), h('span', { class: 'action-desc' }, 'يقرأ network.json من موقعك'))));
+  }
+
 /* words — لوحة الإدارة السرّية (مرحّلات، STUN/TURN، روابط، تشخيص)
    يُحمَّل بالترتيب بعد الملفات السابقة في index.html (نطاق عام مشترك). */
 'use strict';
@@ -2072,7 +2131,7 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
       h('button', { class: 'btn-small', onclick: () => testOne(rl) }, 'فحص'),
       h('button', { class: 'btn-small danger', onclick: async () => { if (await uiConfirm('حذف المرحّل', rl.url, 'حذف', true)) { state.relays = state.relays.filter((x) => x !== rl); applyRelays(); } } }, '✕'));
   }
-  function applyRelays() { save(); pool.setRelays(state.relays); syncSubs(); if (cur === 'admin') updateAdminLive(); }
+  function applyRelays() { save(); pool.setRelays(effectiveRelays()); syncSubs(); if (cur === 'admin') updateAdminLive(); }
   async function testOne(rl) {
     toast('جارٍ فحص ' + rl.url.replace(/^wss?:\/\//, ''));
     const r = await Pool.test(rl.url); const lr = pool.relays.get(rl.url);
@@ -2189,6 +2248,7 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
         h('div', { class: 'action-icon' }, '🌍'), h('div', { class: 'action-text' }, h('span', { class: 'action-title' }, 'عنوان نشر التطبيق'), h('span', { class: 'action-desc ltr' }, state.settings.publicBase || baseUrl() || 'غير محدد'))),
       h('div', { class: 'action-card', onclick: async () => { try { if ('caches' in window) for (const k of await caches.keys()) await caches.delete(k); if (navigator.serviceWorker) for (const r of await navigator.serviceWorker.getRegistrations()) await r.unregister(); toast('مُسح التخزين المؤقت — جارٍ إعادة التحميل'); setTimeout(() => location.reload(), 900); } catch (_) { toast('تعذّر المسح'); } } },
         h('div', { class: 'action-icon' }, '🔄'), h('div', { class: 'action-text' }, h('span', { class: 'action-title' }, 'تحديث التطبيق ومسح التخزين المؤقت'), h('span', { class: 'action-desc' }, 'يجلب أحدث نسخة منشورة'))),
+      h('div', { class: 'section-title' }, 'الشبكة المنشورة للجميع'), publishNetworkCard(),
       h('div', { class: 'section-title' }, 'التثبيت والتذييل'),
       h('div', { class: 'action-card', onclick: showInstallHelp }, h('div', { class: 'action-icon' }, '📲'), h('div', { class: 'action-text' }, h('span', { class: 'action-title' }, 'فحص جاهزية التثبيت'), h('span', { class: 'action-desc' }, 'يعرض ما ينقص موقعك ليظهر زر التثبيت'))),
       linkCard('k', 'رابط منصة كلمات', 'linkK', LINKS.K), linkCard('R', 'رابط ريميل (البريد)', 'linkR', LINKS.R),
@@ -2212,11 +2272,12 @@ window.WORDS_LOGO = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAA
   /* ============ التشغيل ============ */
   let timersStarted = false;
   function startNetwork() {
-    pool.setRelays(state.relays); syncSubs();
+    pool.setRelays(effectiveRelays()); syncSubs(); fetchNetwork();
     if (timersStarted) return; timersStarted = true;
     setInterval(() => { if (pool.openCount() && pool.eoseSeen) { state.lastSync = C.nowSec() - 120; save(); } }, 60000);
     setInterval(() => { if (!document.hidden) { pool.reconnectAll(); } }, 20000);
     setInterval(prune, 3600000);
+    setInterval(fetchNetwork, 30 * 60000);
     setInterval(() => { if (cur === 'admin') updateAdminLive(); }, 3000);
   }
   function registerSW() {
